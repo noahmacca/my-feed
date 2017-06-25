@@ -19,4 +19,4 @@ To run this project:
 - node app.js
 
 
-enjoy!
+Hope you enjoy!
