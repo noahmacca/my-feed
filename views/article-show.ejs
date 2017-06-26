@@ -3,7 +3,12 @@
 <div class="container">
     <div class="row">
         <div class="jumbotron">
-            <h2><%= article.title %></h2>
+            <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-md pull-right">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+            </a>
+            <h2>
+                <%= article.title %>
+            </h2>
             <p><small><%= article.author %> | <%= article.publication %></small></p>
             <p><%= article.articleDesc %></p>
             <p>Posted by <%= article.userId %></p>

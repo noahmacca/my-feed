@@ -43,7 +43,7 @@ function seedDB() {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log("added an article");
+                        console.log("added an article:", article._id.toString());
                     }
                 });
             });
