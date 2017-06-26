@@ -1,0 +1,32 @@
+<% include ./partials/header %>
+
+
+<div class="container">
+    <div class="row">
+        <h1 style="text-align: center;">Post a New Article</h1>
+        <div style="margin: 25px auto; width: 30%;">
+            <form action="/articles" method="POST">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="article[userId]" placeholder="your userId">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="article[title]" placeholder="Article Title">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="article[url]" placeholder="Article URL">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="article[articleDesc]" placeholder="Site Blurb">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="article[userDesc]" placeholder="Your Comments">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+        
+<% include ./partials/footer %>

@@ -1,17 +1,51 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>MyFeed</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
-        <h1>MyFeed</h1>
-        <h3>A place to discover and discuss articles with friends.</h3>
-    </body>
-</html>
+<% include ./partials/header %>
+
+<div class="container">
+    <div class="row col-lg-12">
+        <div class="page-header">
+            <h1>Article Feed <small>All of your friends' recommendations</small></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <h3>Feed Filters</h3>
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation" class="active"><a href="#">Friends</a></li>
+                <li role="presentation"><a href="#">Mine</a></li>
+                <li role="presentation"><a href="#">Recommended</a></li>
+            </ul>
+        </div>
+        
+        <div class="col-md-9">
+            
+                <% articles.forEach((function(article) { %>
+                    <div class="panel panel-default" style="margin-bottom: 5px;">
+                        <div class="panel-body" style="padding-bottom: 0px;">
+                            <h3 style="margin-top: 5px;"><a href="/profile"><%= article.userId %></a> <small>Submitted 2 hours ago</small></h3>
+                            <p><%= article.userDesc %></p>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <h4><a href="<%=article.url%>"><%= article.title %></a></h4>
+                                    <p><small><%= article.author %> | <%= article.publication %></small></p>
+                                    <p><em><%= article.articleDesc %></em></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <button type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like
+                            </button>
+                            <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments
+                            </a>
+                            <button type="button" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add To List
+                            </button>
+                        </div>
+                    </div>
+                <% })); %>
+        </div>
+    </div>
+</div>
+        
+<% include ./partials/footer %>

@@ -1,0 +1,43 @@
+<% include ./partials/header %>
+
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <h2><%= article.title %></h2>
+            <p><small><%= article.author %> | <%= article.publication %></small></p>
+            <p><%= article.articleDesc %></p>
+            <p>Posted by <%= article.userId %></p>
+            <p><a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a></p>
+        </div>
+    </div>
+    <div class="row">
+        <ul class="media-list">
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">nomac</h4><small>Posted 1 hour ago</small>
+                    <p><%= article.userDesc %></p>
+                </div>
+            </li>
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">virajs</h4><small>Posted 1 hour ago</small>
+                    <p>Hmm interesting</p>
+                </div>
+            </li>
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">embram</h4><small>Posted 1 hour ago</small>
+                    <p>Wait is that a thing</p>
+                </div>
+            </li>
+            <li class="media">
+                <div class="media-body">
+                    <h4 class="media-heading">nomac</h4><small>Posted 1 hour ago</small>
+                    <p>Yeah actually it's pretty cool</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<% include ./partials/footer %>
