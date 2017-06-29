@@ -15,8 +15,9 @@ router.get("/", (req, res) => {
 });
 
 // CREATE - Add new article
-router.post("/", (req, res) => {
+router.post("/", isLoggedIn, (req, res) => {
     console.log(`req.user: ${req.user}`);
+    console.log(req.user._id);
     Article.create(req.body.article, (err, newArticle) => {
         if (err) {
             console.log(err);
@@ -28,7 +29,7 @@ router.post("/", (req, res) => {
 });
 
 // NEW - Submit new article form
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
     res.render("article-new");
 });
 
@@ -75,5 +76,12 @@ router.delete("/:id", (req, res) => {
         }
     });
 });
+
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+}
 
 module.exports = router;

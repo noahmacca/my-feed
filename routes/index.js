@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var passport = require("passport");
 var User = require("../models/user");
 
 // Landing page
@@ -24,8 +25,10 @@ router.post("/register", (req, res) => {
             console.log(`Error logging in: ${err.message}`);
             return res.redirect("/register");
         }
-        console.log("User saved to mongo");
-        res.redirect("/articles");
+        passport.authenticate("local")(req, res, () => {
+            console.log("User saved to mongo");
+            res.redirect("/articles");
+        });
     });
 });
 
@@ -35,10 +38,25 @@ router.get("/login", (req, res) => {
 });
 
 // Login logic
-router.post("/login", (req, res) => {       
-    console.log(`Attempting to login: ${req.body}`);
+router.post("/login", passport.authenticate("local", 
+    {
+        successRedirect: "/articles",
+        failureRedirect: "/login"
+    }), (req, res) => {}
+);
+
+// logout route
+router.get("/logout", (req, res) => {
+    req.logout();
     res.redirect("/articles");
-});
+})
+
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+}
 
 // User's Profile Page
 router.get("/user/:id", (req, res) => {
