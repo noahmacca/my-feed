@@ -10,25 +10,34 @@ router.get("/", (req, res) => {
 // -----------------------
 // USER SIGNUP FLOW
 // -----------------------
-// User Registration Page
+// Sign up page
 router.get("/register", (req, res) => {
     res.render("register");
 });
 
-// sign up logic
+// Sign up logic
 router.post("/register", (req, res) => {
     console.log(req.body);
-    res.redirect("/articles");
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, (err, user) => {
+        if(err) {
+            console.log(`Error logging in: ${err.message}`);
+            return res.redirect("/register");
+        }
+        console.log("User saved to mongo");
+        res.redirect("/articles");
+    });
 });
 
-// todo: Shpw login form
+// Login page
 router.get("/login", (req, res) => {
-    res.send("hit login form");
+    res.render("login");
 });
 
-// todo: handling login logic 
-router.post("/login", (req, res) => {
-    res.send("posted to /login");
+// Login logic
+router.post("/login", (req, res) => {       
+    console.log(`Attempting to login: ${req.body}`);
+    res.redirect("/articles");
 });
 
 // User's Profile Page
