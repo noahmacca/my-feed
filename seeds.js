@@ -1,6 +1,8 @@
 var mongoose = require("mongoose");
 var Article = require("./models/article");
 var Comment = require("./models/comment");
+var User = require("./models/user");
+var async = require("async");
 
 var articleData = [
     {
@@ -39,47 +41,52 @@ var commentData = [
     }
 ]
 
+
 function seedDB() {
-    // Remove articles from db
-    Article.remove({}, (err) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("removed articles");
-            Comment.remove({}, (err) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log("removed comments");
-                    // Add boilerplate articles to db
-                    articleData.forEach((sample) => {
-                        Article.create(sample, (err, newArticle) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log("added an article:", newArticle._id.toString());
-                                // create a comment
-                                commentData.forEach((commentDatum) => {
-                                    Comment.create(commentDatum, (err, newComment) => {
-                                        if (err) {
-                                            console.log(err);
-                                        } else {
-                                            console.log(`Comment added for ${newArticle._id} -> ${newComment._id}`);
-                                            newArticle.comments.push(newComment);
-                                            newArticle.save();
-                                            console.log("Created a new comment");
-                                        }
-                                    });
-                                });
-                            }
-                        });
-                    });
-                }
+    async.waterfall([
+        (cb) => {
+            Article.remove({}, (err) => {
+                if (err) { cb(err) }
+                console.log("removed articles");
+                cb(null);
             });
-
+        },
+        (cb) => {
+            Comment.remove({}, (err) => {
+                if (err) { cb(err) }
+                console.log("removed comments");
+                cb(null);
+            })
         }
-    });
+    ], (err, res) => {
+        if (err) {
+            console.log(`Got an error: ${err}`);
+        } else {
+            articleData.forEach((sample) => {
+                Article.create(sample, (err, newArticle) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("added an article:", newArticle._id.toString());
+                        // create a comment
+                        commentData.forEach((commentDatum) => {
+                            Comment.create(commentDatum, (err, newComment) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log(`Comment added for ${newArticle._id} -> ${newComment._id}`);
+                                    newArticle.comments.push(newComment);
+                                    newArticle.save();
+                                    console.log("Created a new comment");
+                                    return(null);
+                                }
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    })
 }
-
 
 module.exports = seedDB;
