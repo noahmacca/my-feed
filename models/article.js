@@ -7,18 +7,19 @@ var articleSchema = new mongoose.Schema({
     articleAuthor: String,
     articleDesc: String,
     desc: String,
+    author: {
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        },
+        username: String
+    },
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment"
         }
-    ],
-    author: {
-        id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        }
-    }
+    ]
 });
 
 module.exports = mongoose.model("Article", articleSchema);

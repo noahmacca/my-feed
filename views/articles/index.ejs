@@ -21,7 +21,7 @@
                 <% articles.forEach((function(article) { %>
                     <div class="panel panel-default" style="margin-bottom: 5px;">
                         <div class="panel-body" style="padding-bottom: 0px;">
-                            <h3 style="margin-top: 5px;"><a href="/user/1234"><%= article.userId %> nomac</a> 
+                            <h3 style="margin-top: 5px;"><a href="/user/1234"><%= article.author.username %></a> 
                             <small>Submitted 2 hours ago</small>
                             <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
                                 <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
@@ -45,7 +45,7 @@
                                 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like
                             </button>
                             <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm">
-                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length%>)
                             </a>
                             <button type="button" class="btn btn-default btn-sm">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add To List

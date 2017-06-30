@@ -7,9 +7,6 @@
         <div style="margin: 25px auto; width: 50%;">
             <form action="/articles/<%= article._id %>?_method=PUT" method="POST">
                 <div class="form-group">
-                    <input class="form-control" type="text" name="article[userId]" placeholder="<%= article.userId %>">
-                </div>
-                <div class="form-group">
                     <input class="form-control" type="text" name="article[title]" value="<%= article.title %>">
                 </div>
                 <div class="form-group">

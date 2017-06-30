@@ -22,7 +22,12 @@ router.post("/", (req, res) => {
             console.log(err);
             res.redirect("/articles");
         } else {
-            Comment.create(req.body.comment, (err, comment) => {
+            var comment = req.body.comment;
+            comment.author = {
+                id: req.user._id,
+                username: req.user.username
+            }
+            Comment.create(comment, (err, comment) => {
                 if(err) {
                     console.log(err);
                 } else {

@@ -24,6 +24,11 @@ router.get("/new", (req, res) => {
 
 // CREATE - Add new article
 router.post("/", (req, res) => {
+    var article = req.body.article;
+    article.author = {
+        id: req.user._id,
+        username: req.user.username
+    }
     Article.create(req.body.article, (err, newArticle) => {
         if (err) {
             console.log(err);
@@ -36,7 +41,10 @@ router.post("/", (req, res) => {
 
 // SHOW - individual article + comment thread
 router.get("/:id", (req, res) => {
-    Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {
+    Article.findById(req.params.id).populate("comments").exec( (err, foundArticle) => {
+        console.log(`req.user._id: ${req.user._id}`);
+        console.log(`foundArticle.author.id: ${foundArticle.author.id}`);
+        console.log(`foundArticle.author.username: ${foundArticle.author.username}`);
         if (err) {
             console.log(err);
         } else {

@@ -11,7 +11,7 @@
             </h2>
             <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
             <p><%= article.articleDesc %></p>
-            <p>Posted by <%= article.userId %></p>
+            <p>Posted by <%= article.author.username %></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
             </div>
@@ -29,7 +29,7 @@
             <% article.comments.forEach(function(comment) { %>
                 <li class="media">
                     <div class="media-body">
-                        <h4 class="media-heading"><%= comment.author %></h4><small>Posted 1 hour ago</small>
+                        <h4 class="media-heading"><%= comment.author.username %></h4><small>Posted 1 hour ago</small>
                         <p><%= comment.text %></p>
                     </div>
                 </li>
