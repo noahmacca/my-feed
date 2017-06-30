@@ -1,6 +1,9 @@
 var express = require("express");
 var router = express.Router();
 var Article = require("../models/article");
+var middleware = require("../middleware");
+
+router.use(middleware.isLoggedIn);
 
 // INDEX - show article feed
 router.get("/", (req, res) => {
@@ -20,7 +23,7 @@ router.get("/new", (req, res) => {
 })
 
 // CREATE - Add new article
-router.post("/", isLoggedIn, (req, res) => {
+router.post("/", (req, res) => {
     Article.create(req.body.article, (err, newArticle) => {
         if (err) {
             console.log(err);
@@ -73,12 +76,5 @@ router.delete("/:id", (req, res) => {
         }
     });
 });
-
-function isLoggedIn(req, res, next) {
-    if(req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
 
 module.exports = router;

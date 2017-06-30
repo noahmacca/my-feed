@@ -2,6 +2,9 @@ var express = require("express");
 var router = express.Router({mergeParams: true});
 var Article = require("../models/article");
 var Comment = require("../models/comment");
+var middleware = require("../middleware");
+
+router.use(middleware.isLoggedIn);
 
 router.get("/new", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
