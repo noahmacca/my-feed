@@ -14,6 +14,7 @@ var User = require("./models/user");
 // Routes
 var indexRoutes = require("./routes/index");
 var articleRoutes = require("./routes/articles");
+var commentRoutes = require("./routes/comments");
 
 mongoose.connect("mongodb://localhost/myfeed");
 
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 
 app.use("/", indexRoutes);
 app.use("/articles", articleRoutes);
+app.use("/articles/:id/comments", commentRoutes)
 
 app.listen(3000, (err, res) => {
     console.log('server started on port 3000');

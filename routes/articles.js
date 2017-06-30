@@ -9,7 +9,8 @@ router.get("/", (req, res) => {
         if (err) {
             console.log(err);
         } else {
-            res.render("index", { articles: allArticles });
+            console.log(allArticles);
+            res.render("articles/index", { articles: allArticles });
         }
     });
 });
@@ -28,19 +29,15 @@ router.post("/", isLoggedIn, (req, res) => {
     });
 });
 
-// NEW - Submit new article form
-router.get("/new", isLoggedIn, (req, res) => {
-    res.render("article-new");
-});
 
 // SHOW - individual article + comment thread
 router.get("/:id", (req, res) => {
-    Article.findById(req.params.id, (err, foundArticle) => {
+    Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {
         if (err) {
             console.log(err);
         } else {
             console.log(foundArticle);
-            res.render("article-show", { article: foundArticle });
+            res.render("articles/show", { article: foundArticle });
         }
     });
 });
@@ -49,7 +46,7 @@ router.get("/:id", (req, res) => {
 router.get("/:id/edit", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         console.log(article);
-        res.render("article-edit", { article: article });
+        res.render("articles/edit", { article: article });
     });
 });
 
