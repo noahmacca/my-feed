@@ -10,6 +10,7 @@ var seedDB = require("./seeds");
 // Mongo Models
 var Article = require("./models/article");
 var User = require("./models/user");
+var Comment = require("./models/comment");
 
 // Routes
 var indexRoutes = require("./routes/index");
@@ -41,9 +42,38 @@ app.use((req, res, next) => {
     next();
 })
 
+app.get("/articles/:id/comments/new", (req, res) => {
+    Article.findById(req.params.id, (err, article) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("comments/new", {article: article})
+        }
+    });
+});
+
+app.post("/articles/:id/comments", (req, res) => {
+    Article.findById(req.params.id, function(err, article) {
+        if(err) {
+            console.log(err);
+            res.redirect("/articles");
+        } else {
+            Comment.create(req.body.comment, (err, comment) => {
+                if(err) {
+                    console.log(err);
+                } else {
+                    article.comments.push(comment);
+                    article.save();
+                    res.redirect(`/articles/${article._id}`);
+                }
+            });
+        }
+    })
+});
+
 app.use("/", indexRoutes);
 app.use("/articles", articleRoutes);
-app.use("/articles/:id/comments", commentRoutes)
+// app.use("/articles/:id/comments", commentRoutes)
 
 app.listen(3000, (err, res) => {
     console.log('server started on port 3000');

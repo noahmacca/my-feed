@@ -12,7 +12,9 @@
             <p><small><%= article.author %> | <%= article.publication %></small></p>
             <p><%= article.articleDesc %></p>
             <p>Posted by <%= article.userId %></p>
-            <p><a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a></p>
+            <div class="text-center">
+                <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -32,6 +34,9 @@
                     </div>
                 </li>
             <% }); %>
+            <p class="text-center">
+                <a class="btn btn-success" href="/articles/<%= article._id %>/comments/new">New Comment</a>
+            </p>
         </ul>
     </div>
 </div>

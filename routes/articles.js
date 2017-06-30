@@ -4,7 +4,6 @@ var Article = require("../models/article");
 
 // INDEX - show article feed
 router.get("/", (req, res) => {
-    console.log(`req.user: ${req.user}`);
     Article.find({}, (err, allArticles) => {
         if (err) {
             console.log(err);
@@ -15,10 +14,13 @@ router.get("/", (req, res) => {
     });
 });
 
+// New Article Form
+router.get("/new", (req, res) => {
+    res.render("articles/new");
+})
+
 // CREATE - Add new article
 router.post("/", isLoggedIn, (req, res) => {
-    console.log(`req.user: ${req.user}`);
-    console.log(req.user._id);
     Article.create(req.body.article, (err, newArticle) => {
         if (err) {
             console.log(err);
@@ -36,7 +38,6 @@ router.get("/:id", (req, res) => {
         if (err) {
             console.log(err);
         } else {
-            console.log(foundArticle);
             res.render("articles/show", { article: foundArticle });
         }
     });
@@ -45,7 +46,6 @@ router.get("/:id", (req, res) => {
 // EDIT ARTICLE
 router.get("/:id/edit", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
-        console.log(article);
         res.render("articles/edit", { article: article });
     });
 });

@@ -3,8 +3,6 @@ var router = express.Router();
 var Article = require("../models/article");
 var Comments = require("../models/comment");
 
-router.get("/new", (req, res) => {
-    res.render("comments/new");
-});
+// todo: transfer routes from app.js
 
 module.exports = router;
