@@ -7,6 +7,12 @@ var articleSchema = new mongoose.Schema({
     author: String,
     articleDesc: String,
     userDesc: String,
+    comments: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment"
+        }
+    ],
     poster: {
         id: {
             type: mongoose.Schema.Types.ObjectId,

@@ -18,5 +18,11 @@ To run this project:
 - npm i
 - node app.js
 
+Potential names/domains:
+- readie.io
+- friendforum.io
+
+
 
 Hope you enjoy!
+

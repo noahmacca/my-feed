@@ -1,7 +1,8 @@
 var mongoose = require("mongoose");
 var Article = require("./models/article");
+var Comment = require("./models/comment");
 
-var data = [
+var articleData = [
     {
         userId: "nomac",
         url: "https://www.theatlantic.com/health/archive/2014/03/the-toxins-that-threaten-our-brains/284466/",
@@ -9,7 +10,8 @@ var data = [
         publication: "The Atlantic",
         author: "James Hamblin",
         articleDesc: "Leading scientists recently identified a dozen chemicals as being responsible for widespread behavioral and cognitive problems. But the scope of the chemical dangers in our environment is likely even greater. Why children and the poor are most susceptible to neurotoxic exposure that may be costing the U.S. billions of dollars and immeasurable peace of mind.",
-        userDesc: "This article is so awesome!! @viraj any thoughts?"
+        userDesc: "This article is so awesome!! @viraj any thoughts?",
+
     },
     {
         userId: "nomac",
@@ -30,6 +32,14 @@ var data = [
         userDesc: "Beautiful poem, @embram you like cats you should check this out"
     }
 ]
+
+var commentData = [
+    {
+        text: "What is this amazing prose",
+        author: "viraj"
+    }
+]
+
 function seedDB() {
     // Remove articles from db
     Article.remove({}, (err) => {
@@ -37,16 +47,37 @@ function seedDB() {
             console.log(err);
         } else {
             console.log("removed articles");
-            // Add boilerplate articles to db
-            data.forEach((sample) => {
-                Article.create(sample, (err, article) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("added an article:", article._id.toString());
-                    }
-                });
+            Comment.remove({}, (err) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("removed comments");
+                    // Add boilerplate articles to db
+                    articleData.forEach((sample) => {
+                        Article.create(sample, (err, newArticle) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("added an article:", newArticle._id.toString());
+                                // create a comment
+                                commentData.forEach((commentDatum) => {
+                                    Comment.create(commentDatum, (err, newComment) => {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            console.log(`Comment added for ${newArticle._id} -> ${newComment._id}`);
+                                            newArticle.comments.push(newComment);
+                                            newArticle.save();
+                                            console.log("Created a new comment");
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
             });
+
         }
     });
 }
