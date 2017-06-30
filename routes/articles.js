@@ -34,7 +34,6 @@ router.post("/", (req, res) => {
     });
 });
 
-
 // SHOW - individual article + comment thread
 router.get("/:id", (req, res) => {
     Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {

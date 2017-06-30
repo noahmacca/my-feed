@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 
 app.use("/", indexRoutes);
 app.use("/articles", articleRoutes);
-app.use("/articles/:id/comments", commentRoutes)
+app.use("/articles/:id/comments", commentRoutes);
 
 app.listen(3000, (err, res) => {
     console.log('server started on port 3000');

@@ -4,16 +4,16 @@ var articleSchema = new mongoose.Schema({
     url: String,
     title: String,
     publication: String,
-    author: String,
+    articleAuthor: String,
     articleDesc: String,
-    userDesc: String,
+    desc: String,
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment"
         }
     ],
-    poster: {
+    author: {
         id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"

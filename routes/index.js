@@ -8,9 +8,6 @@ router.get("/", (req, res) => {
     res.render("landing");
 });
 
-// -----------------------
-// USER SIGNUP FLOW
-// -----------------------
 // Sign up page
 router.get("/register", (req, res) => {
     res.render("register");
@@ -49,14 +46,7 @@ router.post("/login", passport.authenticate("local",
 router.get("/logout", (req, res) => {
     req.logout();
     res.redirect("/articles");
-})
-
-function isLoggedIn(req, res, next) {
-    if(req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
+});
 
 // User's Profile Page
 router.get("/user/:id", (req, res) => {
