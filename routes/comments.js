@@ -36,6 +36,7 @@ router.post("/", (req, res) => {
                 } else {
                     article.comments.push(comment);
                     article.save();
+                    req.flash("success", "Successfully added comment");
                     res.redirect(`/articles/${article._id}`);
                 }
             });
@@ -56,6 +57,7 @@ router.put("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
         if (err) {
             res.redirect("/articles"); // todo: handle this better
         } else {
+            req.flash("success", "Updated comment!");
             res.redirect(`/articles/${req.params.id}`);
         }
     });
@@ -76,13 +78,13 @@ router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
                 var counter = 0;
                 article.comments.forEach((comment) => {
                     if (!comment.id.equals(objectId.id)) {
-                        console.log("does not equal");
                         newComments.push(comment);
                     }
                     counter++;
                     if (numComments === counter) { // iterated through all comments
                         article.comments = newComments;
                         article.save();
+                        req.flash("success", "Deleted comment");
                         res.redirect(`/articles/${article._id}`);
                     }
                 });
@@ -90,6 +92,5 @@ router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
         }
     });
 });
-
 
 module.exports = router;

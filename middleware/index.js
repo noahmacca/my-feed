@@ -7,6 +7,7 @@ middleware.isLoggedIn = function(req, res, next) {
     if(req.isAuthenticated()) {
         return next();
     }
+    req.flash("error", "You must be logged in to access this page");
     res.redirect("/login");
 }
 
@@ -21,12 +22,13 @@ middleware.checkPostOwnership = function(req, res, next) {
                 if (foundArticle.author.id.equals(req.user._id)) {
                     next();
                 } else {
-                    console.log("error", "You don't have mermission to do that");
+                    req.flash("error", "You don't have mermission to do that");
                     res.redirect("back");
                 }
             }
         });
     } else {
+        req.flash("error", "You must be logged in to do that")
         res.redirect("back");
     }
 }
@@ -35,16 +37,22 @@ middleware.checkCommentOwnership = function(req, res, next) {
     if (req.isAuthenticated()) {
         // Find comment author and compare to current author
         Comment.findById(req.params.comment_id, (err, foundComment) => {
-            if(err) { res.redirect("back");}
+            if(err) { 
+                req.flash("error:", err);
+                res.redirect("back");
+            }
             else {
                 if (foundComment.author.id.equals(req.user._id)) {
                     next();
                 } else {
-                    console.log("You don't have permission to do that");
+                    req.flash("error", "You don't have permission to do that");
                     res.redirect("back");
                 }
             }
         });
+    } else {
+        req.flash("error", "You must be logged in to do that");
+        res.redirect("back"); // shouldn't generally hit this case
     }
 }
 

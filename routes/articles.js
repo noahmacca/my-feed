@@ -10,6 +10,7 @@ router.get("/", (req, res) => {
     Article.find({}, (err, allArticles) => {
         if (err) {
             console.log(err);
+            req.flash("error", `Error getting articles from db: ${err}`);
         } else {
             res.render("articles/index", { articles: allArticles });
         }
@@ -31,9 +32,11 @@ router.post("/", (req, res) => {
     Article.create(req.body.article, (err, newArticle) => {
         if (err) {
             console.log(err);
+            req.flash("error", `Error creating article: ${err}`);
         } else {
             console.log("made a new campground");
-            res.redirect("/articles");
+            req.flash("success", "New Post Created");
+            res.redirect(`/articles/${newArticle._id}`);
         }
     });
 });
@@ -42,6 +45,7 @@ router.post("/", (req, res) => {
 router.get("/:id", (req, res) => {
     Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {
         if (err) {
+            req.flash("error", `Error finding article: ${err}`);
             console.log(err);
         } else {
             res.render("articles/show", { article: foundArticle });
@@ -52,7 +56,12 @@ router.get("/:id", (req, res) => {
 // EDIT ARTICLE
 router.get("/:id/edit", middleware.checkPostOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
-        res.render("articles/edit", { article: article });
+        if(err) {
+            req.flash("error", `Error finding article: ${err}`);
+            res.redirect("back");
+        } else {
+            res.render("articles/edit", { article: article });
+        }
     });
 });
 
@@ -65,8 +74,10 @@ router.put("/:id", middleware.checkPostOwnership, (req, res) => {
     }
     Article.findByIdAndUpdate(req.params.id, article, (err, article) => {
         if (err) {
+            req.flash("error", `Error updating article: ${err}`);
             res.redirect("/articles"); // todo: handle this better
         } else {
+            req.flash("success", "Post Updated");
             res.redirect(`/articles/${req.params.id}`);
         }
     });
@@ -76,9 +87,11 @@ router.put("/:id", middleware.checkPostOwnership, (req, res) => {
 router.delete("/:id", middleware.checkPostOwnership, (req, res) => {
     Article.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
+            req.flash("error", `Error deleting article: ${err}`)
             res.redirect("/articles");
             console.log("error: ", err); // todo: better error handling
         } else {
+            req.flash("success", "Post Deleted");
             res.redirect("/articles");
         }
     });

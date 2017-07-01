@@ -20,10 +20,12 @@ router.post("/register", (req, res) => {
     User.register(newUser, req.body.password, (err, user) => {
         if(err) {
             console.log(`Error logging in: ${err.message}`);
+            req.flash("error", err.message);
             return res.redirect("/register");
         }
         passport.authenticate("local")(req, res, () => {
             console.log("User saved to mongo");
+            req.flash("success", "Welcome to MyFeed!");
             res.redirect("/articles");
         });
     });
@@ -45,7 +47,8 @@ router.post("/login", passport.authenticate("local",
 // logout route
 router.get("/logout", (req, res) => {
     req.logout();
-    res.redirect("/articles");
+    req.flash("success", "Logged Out");
+    res.redirect("/#");
 });
 
 // User's Profile Page
