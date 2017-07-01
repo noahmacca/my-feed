@@ -12,7 +12,7 @@
                 </form>
             <% } %>
             <h2>
-                <%= article.title %>
+                <a href="<%=article.url%>"><%= article.title %></a>
             </h2>
             <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
             <p><%= article.articleDesc %></p>

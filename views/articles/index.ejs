@@ -16,10 +16,8 @@
                 <li role="presentation"><a href="#">Recommended</a></li>
             </ul>
         </div>
-        
         <div class="col-md-9">
-            
-                <% articles.forEach((function(article) { %>
+                <% articles.forEach((function(article, index) { %>
                     <div class="panel panel-default" style="margin-bottom: 5px;">
                         <div class="panel-body" style="padding-bottom: 0px;">
                             <h3 style="margin-top: 5px;">
@@ -48,21 +46,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="panel-footer">
-                            <button type="button" class="btn btn-default btn-sm">
-                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like
-                            </button>
+                        <div class="panel-footer">                            
                             <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm">
                                 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
                             </a>
-                            <button type="button" class="btn btn-default btn-sm">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add To List
+                            <button id="share-button" type="button" class="btn btn-default btn-sm" onclick="showShareLink(<%=index%>)">
+                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                             </button>
+                            <span id="copied-message" style="margin-left: 1.0em; display: none;">Copied!</span>
+                            <input id="share-link" style="margin-top: 10px; display: none;" class="form-control" type="text" value="http://localhost:3000/articles/<%=article._id%>"></input>
                         </div>
                     </div>
                 <% })); %>
         </div>
     </div>
 </div>
+
+<script>
+
+</script>
 
 <% include ../partials/footer %>
