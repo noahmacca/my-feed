@@ -4,6 +4,7 @@ var router = express.Router({mergeParams: true});
 var Article = require("../models/article");
 var Comment = require("../models/comment");
 var middleware = require("../middleware");
+var moment = require("moment");
 
 router.use(middleware.isLoggedIn);
 
@@ -26,6 +27,7 @@ router.post("/", (req, res) => {
             res.redirect("/articles");
         } else {
             var comment = req.body.comment;
+            comment.createdAt = moment().format();
             comment.author = {
                 id: req.user._id,
                 username: req.user.username

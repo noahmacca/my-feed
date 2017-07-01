@@ -49,7 +49,6 @@ router.get("/:id", (req, res) => {
             req.flash("error", `Error finding article: ${err}`);
             console.log(err);
         } else {
-            console.log(moment(foundArticle._id.generationTime).format());
             res.render("articles/show", { article: foundArticle });
         }
     });

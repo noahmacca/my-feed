@@ -26,7 +26,10 @@
         <ul class="media-list">
             <li class="media">
                 <div class="media-body">
-                    <h4 class="media-heading">nomac</h4><small>Posted 1 hour ago</small>
+                    <h4 class="media-heading">
+                        <%= article.author.username %>
+                    </h4>
+                    <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
                     <p><%= article.desc %></p>
                 </div>
             </li>
@@ -37,7 +40,7 @@
                         <h4 class="media-heading">
                             <%= comment.author.username %>
                         </h4>
-                        <small>Posted 1 hour ago</small>
+                        <p><em><%= moment(comment.createdAt).format(momentFormat) %></em></p>
                         <p><%= comment.text %></p>
                         <% if (currentUser && comment.author.id && comment.author.id.equals(currentUser._id)) { %>
                             <form class="pull-left" action="/articles/<%= article._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
