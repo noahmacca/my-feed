@@ -16,7 +16,7 @@
             </h2>
             <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
             <p><%= article.articleDesc %></p>
-            <p>Posted by <%= article.author.username %></p>
+            <p>Posted by <%= article.author.username %> on <%= moment(article.createdAt).format(momentFormat) %></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
             </div>

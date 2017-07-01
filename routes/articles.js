@@ -1,3 +1,4 @@
+var moment = require("moment");
 var express = require("express");
 var router = express.Router();
 var Article = require("../models/article");
@@ -25,16 +26,16 @@ router.get("/new", (req, res) => {
 // CREATE - Add new article
 router.post("/", (req, res) => {
     var article = req.body.article;
+    article.createdAt = moment().format();
     article.author = {
         id: req.user._id,
         username: req.user.username
     }
-    Article.create(req.body.article, (err, newArticle) => {
+    Article.create(article, (err, newArticle) => {
         if (err) {
             console.log(err);
             req.flash("error", `Error creating article: ${err}`);
         } else {
-            console.log("made a new campground");
             req.flash("success", "New Post Created");
             res.redirect(`/articles/${newArticle._id}`);
         }
@@ -48,6 +49,7 @@ router.get("/:id", (req, res) => {
             req.flash("error", `Error finding article: ${err}`);
             console.log(err);
         } else {
+            console.log(moment(foundArticle._id.generationTime).format());
             res.render("articles/show", { article: foundArticle });
         }
     });

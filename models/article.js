@@ -7,6 +7,7 @@ var articleSchema = new mongoose.Schema({
     articleAuthor: String,
     articleDesc: String,
     desc: String,
+    createdAt: String,
     author: {
         id: {
             type: mongoose.Schema.Types.ObjectId,

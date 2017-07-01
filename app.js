@@ -7,6 +7,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var methodOverride = require("method-override");
 var seedDB = require("./seeds");
+var moment = require("moment");
 
 // Mongo Models
 var Article = require("./models/article");
@@ -41,6 +42,8 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.moment = moment;
+    res.locals.momentFormat = "MMMM D, h:mm a";
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     next();
