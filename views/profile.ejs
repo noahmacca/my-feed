@@ -1,15 +1,51 @@
-<div class="container">
-    <div class="row">
-        <h1>Your Profile</h1>
-        <ul>
-            <li>Name</li>
-            <li>Articles Posted: 5</li>
-            <li>Your Friends:</li>
-        </ul>
+<% include ./partials/header %>
 
-        <h3>Notes:</h3>
-        <ul>
-            <li>Must show public or private profile as appropriate</li>
-        </ul>
+
+<div class="container">
+    <div class="row col-lg-8 col-md-offset-2 text-center">
+        <div class="page-header">
+            <h1><%= user.username %>'s posts</h1>
+            <p>
+                Joined on <%= moment(user.createdAt).format("MMMM D, YYYY") %>. 
+                Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
+            </p>
+        </div>
+        <div>
+            <% articles.forEach((function(article) { %>
+                <div class="panel panel-default" style="margin-bottom: 5px;">
+                    <div class="panel-body text-left" style="padding-bottom: 0px;">
+                        <h4>
+                            <a href="<%=article.url%>"><%= article.title %></a>
+                            <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
+                                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                                    <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                </form>
+                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                </a>
+                            <% } %>
+                        </h4>
+                        <div>
+                            <small>posted on <%= moment(article.createdAt).format(momentFormat) %></small>
+                        </div>
+                        <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
+                        <p><em><%= article.articleDesc %></em></p>
+                    </div>
+                    <div class="panel-footer text-left">
+                        <button type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like
+                        </button>
+                        <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
+                        </a>
+                        <button type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add To List
+                        </button>
+                    </div>
+                </div>
+            <% })); %>
+        </div>
     </div>
 </div>
+
+<% include ./partials/footer %>

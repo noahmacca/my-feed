@@ -4,7 +4,7 @@
     <div class="row">
         <h1 style="text-align: center">Sign Up</h1>
         <div style="width: 30%; margin: 25px auto;">
-            <form action="/register" method="POST">
+            <form action="/register/?redirect=<%= redirect %>" method="POST">
                 <input class="form-group form-control" type="text" name="username" placeholder="username">
                 <input class="form-group form-control" type="password" name="password", placeholder="password">
                 <button class="btn btn-lg btn-primary btn-block">Sign Up</button>
