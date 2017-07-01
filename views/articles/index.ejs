@@ -23,12 +23,14 @@
                         <div class="panel-body" style="padding-bottom: 0px;">
                             <h3 style="margin-top: 5px;"><a href="/user/1234"><%= article.author.username %></a> 
                             <small>Submitted 2 hours ago</small>
-                            <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                                <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                            </form>
-                            <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
-                            </a>
+                            <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
+                                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                                    <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                </form>
+                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                </a>
+                            <% } %>
                             </h3>
                             
                             <p><%= article.desc %></p>
