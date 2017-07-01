@@ -70,29 +70,29 @@ function seedDB() {
         if (err) {
             console.log(`Got an error: ${err}`);
         } else {
-            articleData.forEach((sample) => {
-                Article.create(sample, (err, newArticle) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("added an article:", newArticle._id.toString());
-                        // create a comment
-                        commentData.forEach((commentDatum) => {
-                            Comment.create(commentDatum, (err, newComment) => {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    console.log(`Comment added for ${newArticle._id} -> ${newComment._id}`);
-                                    newArticle.comments.push(newComment);
-                                    newArticle.save();
-                                    console.log("Created a new comment");
-                                    return(null);
-                                }
-                            });
-                        });
-                    }
-                });
-            });
+            // articleData.forEach((sample) => {
+            //     Article.create(sample, (err, newArticle) => {
+            //         if (err) {
+            //             console.log(err);
+            //         } else {
+            //             console.log("added an article:", newArticle._id.toString());
+            //             // create a comment
+            //             commentData.forEach((commentDatum) => {
+            //                 Comment.create(commentDatum, (err, newComment) => {
+            //                     if (err) {
+            //                         console.log(err);
+            //                     } else {
+            //                         console.log(`Comment added for ${newArticle._id} -> ${newComment._id}`);
+            //                         newArticle.comments.push(newComment);
+            //                         newArticle.save();
+            //                         console.log("Created a new comment");
+            //                         return(null);
+            //                     }
+            //                 });
+            //             });
+            //         }
+            //     });
+            // });
         }
     })
 }
