@@ -50,14 +50,14 @@ router.get("/:id", (req, res) => {
 });
 
 // EDIT ARTICLE
-router.get("/:id/edit", checkPostOwnership, (req, res) => {
+router.get("/:id/edit", middleware.checkPostOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         res.render("articles/edit", { article: article });
     });
 });
 
 // UPDATE ARTICLE
-router.put("/:id", checkPostOwnership, (req, res) => {
+router.put("/:id", middleware.checkPostOwnership, (req, res) => {
     var article = req.body.article;
     article.author = {
         id: req.user._id,
@@ -73,7 +73,7 @@ router.put("/:id", checkPostOwnership, (req, res) => {
 });
 
 // DESTROY ARTICLE
-router.delete("/:id", checkPostOwnership, (req, res) => {
+router.delete("/:id", middleware.checkPostOwnership, (req, res) => {
     Article.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
             res.redirect("/articles");
@@ -84,25 +84,5 @@ router.delete("/:id", checkPostOwnership, (req, res) => {
     });
 });
 
-function checkPostOwnership(req, res, next) {
-    if (req.isAuthenticated()) {
-        // find the post author and compare to current user
-        Article.findById(req.params.id, function (err, foundArticle) {
-            if (err) {
-                console.log("article not found");
-                res.redirect("back");
-            } else {
-                if (foundArticle.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    console.log("error", "You don't have mermission to do that");
-                    res.redirect("back");
-                }
-            }
-        });
-    } else {
-        res.redirect("back");
-    }
-}
 
 module.exports = router;

@@ -44,14 +44,14 @@ router.post("/", (req, res) => {
 });
 
 // EDIT COMMENT FORM
-router.get("/:comment_id/edit", checkCommentOwnership, (req, res) => {
+router.get("/:comment_id/edit", middleware.checkCommentOwnership, (req, res) => {
     Comment.findById(req.params.comment_id, (err, comment) => {
         res.render("comments/edit", { articleId: req.params.id, comment: comment });
     });
 });
 
 // UPDATE COMMENT
-router.put("/:comment_id", checkCommentOwnership, (req, res) => {
+router.put("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, comment) => {
         if (err) {
             res.redirect("/articles"); // todo: handle this better
@@ -62,7 +62,7 @@ router.put("/:comment_id", checkCommentOwnership, (req, res) => {
 });
 
 // DESTROY COMMEMNT
-router.delete("/:comment_id", checkCommentOwnership, (req, res) => {
+router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndRemove(req.params.comment_id, (err) => {
         if (err) {
             res.redirect("/articles");
@@ -90,23 +90,6 @@ router.delete("/:comment_id", checkCommentOwnership, (req, res) => {
         }
     });
 });
-
-function checkCommentOwnership(req, res, next) {
-    if (req.isAuthenticated()) {
-        // Find comment author and compare to current author
-        Comment.findById(req.params.comment_id, (err, foundComment) => {
-            if(err) { res.redirect("back");}
-            else {
-                if (foundComment.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    console.log("You don't have permission to do that");
-                    res.redirect("back");
-                }
-            }
-        });
-    }
-}
 
 
 module.exports = router;
