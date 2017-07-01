@@ -50,14 +50,14 @@ router.get("/:id", (req, res) => {
 });
 
 // EDIT ARTICLE
-router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
+router.get("/:id/edit", checkPostOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         res.render("articles/edit", { article: article });
     });
 });
 
 // UPDATE ARTICLE
-router.put("/:id", checkCampgroundOwnership, (req, res) => {
+router.put("/:id", checkPostOwnership, (req, res) => {
     var article = req.body.article;
     article.author = {
         id: req.user._id,
@@ -73,7 +73,7 @@ router.put("/:id", checkCampgroundOwnership, (req, res) => {
 });
 
 // DESTROY ARTICLE
-router.delete("/:id", checkCampgroundOwnership, (req, res) => {
+router.delete("/:id", checkPostOwnership, (req, res) => {
     Article.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
             res.redirect("/articles");
@@ -84,15 +84,14 @@ router.delete("/:id", checkCampgroundOwnership, (req, res) => {
     });
 });
 
-function checkCampgroundOwnership(req, res, next) {
+function checkPostOwnership(req, res, next) {
     if (req.isAuthenticated()) {
-        // does the user own the campground?
+        // find the post author and compare to current user
         Article.findById(req.params.id, function (err, foundArticle) {
             if (err) {
                 console.log("article not found");
                 res.redirect("back");
             } else {
-                // does the user own the campground
                 if (foundArticle.author.id.equals(req.user._id)) {
                     next();
                 } else {
