@@ -40,10 +40,7 @@ router.post("/", (req, res) => {
 
 // SHOW - individual article + comment thread
 router.get("/:id", (req, res) => {
-    Article.findById(req.params.id).populate("comments").exec( (err, foundArticle) => {
-        console.log(`req.user._id: ${req.user._id}`);
-        console.log(`foundArticle.author.id: ${foundArticle.author.id}`);
-        console.log(`foundArticle.author.username: ${foundArticle.author.username}`);
+    Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {
         if (err) {
             console.log(err);
         } else {
@@ -53,16 +50,20 @@ router.get("/:id", (req, res) => {
 });
 
 // EDIT ARTICLE
-router.get("/:id/edit", (req, res) => {
+router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         res.render("articles/edit", { article: article });
     });
 });
 
 // UPDATE ARTICLE
-router.put("/:id", (req, res) => {
-    console.log(req.body.article);
-    Article.findByIdAndUpdate(req.params.id, req.body.article, (err, article) => {
+router.put("/:id", checkCampgroundOwnership, (req, res) => {
+    var article = req.body.article;
+    article.author = {
+        id: req.user._id,
+        username: req.user.username
+    }
+    Article.findByIdAndUpdate(req.params.id, article, (err, article) => {
         if (err) {
             res.redirect("/articles"); // todo: handle this better
         } else {
@@ -72,7 +73,7 @@ router.put("/:id", (req, res) => {
 });
 
 // DESTROY ARTICLE
-router.delete("/:id", (req, res) => {
+router.delete("/:id", checkCampgroundOwnership, (req, res) => {
     Article.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
             res.redirect("/articles");
@@ -82,5 +83,27 @@ router.delete("/:id", (req, res) => {
         }
     });
 });
+
+function checkCampgroundOwnership(req, res, next) {
+    if (req.isAuthenticated()) {
+        // does the user own the campground?
+        Article.findById(req.params.id, function (err, foundArticle) {
+            if (err) {
+                console.log("article not found");
+                res.redirect("back");
+            } else {
+                // does the user own the campground
+                if (foundArticle.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    console.log("error", "You don't have mermission to do that");
+                    res.redirect("back");
+                }
+            }
+        });
+    } else {
+        res.redirect("back");
+    }
+}
 
 module.exports = router;
