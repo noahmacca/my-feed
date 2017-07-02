@@ -1,6 +1,5 @@
 <% include ./partials/header %>
 
-
 <div class="container">
     <div class="row col-lg-8 col-md-offset-2 text-center">
         <div class="page-header">
@@ -9,7 +8,19 @@
                 Joined on <%= moment(user.createdAt).format("MMMM D, YYYY") %>. 
                 Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
             </p>
-            
+                <% if (!currentUser) { %>
+                    <p>
+                        <form action="/user/follow/<%= user._id %>/" method="POST">
+                            <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
+                        </form>
+                    </p>
+                <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
+                    <p>
+                        <form action="/user/follow/<%= user._id %>/" method="POST">
+                            <button class="btn btn-default btn-lg"></span>Follow</button>
+                        </form>
+                    </p>
+                <% } %>
         </div>
         <div>
             <% articles.reverse().forEach((function(article, index) { %>
@@ -17,16 +28,8 @@
                     <div class="panel-body text-left" style="padding-bottom: 0px;">
                         <h4>
                             <a href="<%=article.url%>"><%= article.title %></a>
-                            <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
-                                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                                    <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                                </form>
-                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
-                                </a>
-                            <% } %>
                         </h4>
-                        <div><small><%= article.articleAuthor %> | <%= article.publication %></small></div>
+                        <div><small><%= article.publication %></small></div>
                         <p>
                             <small>posted on <%= moment(article.createdAt).format(momentFormat) %></small>
                         </p>
@@ -39,13 +42,32 @@
                         <button id="share-button" type="button" class="btn btn-default btn-sm" onclick="showShareLink(<%=index%>)">
                             <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                         </button>
+                        <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
+                            <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                                <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                            </form>
+                            <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                            </a>
+                        <% } %>
                         <span id="copied-message" style="margin-left: 1.0em; display: none;">Copied!</span>
                         <input id="share-link" style="margin-top: 10px; display: none;" class="form-control" type="text" value="http://localhost:3000/articles/<%=article._id%>"></input>
                     </div>
                 </div>
             <% })); %>
         </div>
+        <div>
+            <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
+                <p>
+                    <form action="/user/unfollow/<%= user._id %>/" method="POST">
+                        <button class="btn btn-danger btn-lg"></span>Unfollow</button>
+                    </form>
+                </p>
+            <% } %>
+        </div>
     </div>
 </div>
+
+
 
 <% include ./partials/footer %>

@@ -27,14 +27,6 @@
                                 <a href="/user/<%= article.author.id.toString() %>/">
                                     <%= article.author.username %>
                                 </a> 
-                                <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
-                                    <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                                        <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                                    </form>
-                                    <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
-                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
-                                    </a>
-                                <% } %>
                                 <div>
                                     <small>posted on <%= moment(article.createdAt).format(momentFormat) %></small>
                                 </div>
@@ -56,6 +48,14 @@
                             <button id="share-button" type="button" class="btn btn-default btn-sm" onclick="showShareLink(<%=index%>)">
                                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                             </button>
+                            <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
+                                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                                    <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                </form>
+                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                </a>
+                            <% } %>
                             <span id="copied-message" style="margin-left: 1.0em; display: none;">Copied!</span>
                             <input id="share-link" style="margin-top: 10px; display: none;" class="form-control" type="text" value="http://localhost:3000/articles/<%=article._id%>"></input>
                         </div>

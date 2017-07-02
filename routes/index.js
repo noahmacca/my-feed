@@ -5,6 +5,7 @@ var User = require("../models/user");
 var Article = require("../models/article");
 var moment = require("moment");
 var middleware = require("../middleware");
+var mongoose = require("mongoose");
 
 // Landing page
 router.get("/", (req, res) => {
@@ -50,7 +51,7 @@ router.post("/login", (req, res, next) => {
             return res.redirect("/login");
         }
         if(!user) {
-            req.flash("error", "Authentication Failed");
+            req.flash("error", "Authentication failed: username or password incorrect.");
             return res.redirect("/login");
         }
         req.login(user, (err) => {
@@ -96,7 +97,8 @@ router.get("/user/:id", (req, res) => {
                         }
                         counter++;
                         if (counter == allArticles.length) {
-                            res.render("profile", { user: user, articles: articles });
+                            var isFollowing = req.user ? isAlreadyFollowing(req.user.following, user) : false
+                            res.render("profile", { user: user, articles: articles, isFollowing: isFollowing });
                         }
                     });
                 }
@@ -105,4 +107,68 @@ router.get("/user/:id", (req, res) => {
     });
 });
 
+// Follow new user
+router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
+    // load the person's follow list
+    User.findById(req.user._id, (err, user) => {
+        if(err) {
+            req.flash("error", `Error fetching user: ${err}`);
+            res.redirect("back");
+        } else {
+            // Look up the followee add them to the list
+            User.findById(req.params.id, (err, followee) => {
+                if (followee._id.equals(user._id)) {
+                    req.flash("error", "You can't follow yourself!");
+                    res.redirect(`/user/${followee._id}`);    
+                } else if (isAlreadyFollowing(user.following, followee)) {
+                    req.flash("error", "You're already following this person!");
+                    res.redirect(`/user/${followee._id}`);    
+                } else {
+                    user.following.push(followee);
+                    user.save();
+                    req.flash("success", `Successfully followed ${followee.username}`);
+                    res.redirect(`/user/${followee._id}`);
+                }
+            });
+        }
+    });
+});
+
+// Unollow new user
+router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
+    // load the user's information
+    User.findById(req.user._id, (err, user) => {
+        if(err) {
+            req.flash("error", `Error fetching user: ${err}`);
+            res.redirect("back");
+        } else {
+            var newFollowees = []
+            var removeUserId = mongoose.Types.ObjectId(req.params.id);
+            var numFollows = user.following.length;
+            var counter = 0;
+            user.following.forEach((followee) => {
+                if (!followee._id.equals(removeUserId)) {
+                    newFollowees.push(followee);
+                }
+                counter++;
+                if (user.following.length === counter) {
+                    user.following = newFollowees;
+                    user.save()
+                    req.flash("success", "Unfollowed!")
+                    res.redirect(`/user/${req.params.id}`);
+                }
+            });
+        }
+    });
+});
+
 module.exports = router;
+
+function isAlreadyFollowing(followingArray, followee) {
+    for (var i=0; i < followingArray.length; i++) {
+        if (followingArray[i]._id.equals(followee._id)) {
+            return true
+        }
+    }
+    return false
+}

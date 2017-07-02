@@ -34,8 +34,10 @@
                 </div>
             </li>
             <hr>
-            <% if (currentUser) { %>
-                <% article.comments.forEach(function(comment) { %>
+            <% if (!currentUser) { %>
+                <div class="alert alert-warning"><a href="/login?redirect=<%=currentRoute%>">Login</a> or <a href="/register?redirect=<%=currentRoute%>">sign up</a> to comment and see the discussion!</div>
+            <% } else { %>
+                 <% article.comments.forEach(function(comment) { %>
                     <li class="media">
                         <div class="media-body">
                             <h4 class="media-heading">
@@ -57,8 +59,6 @@
                 <p class="text-center">
                     <a class="btn btn-success" href="/articles/<%= article._id %>/comments/new">New Comment</a>
                 </p>
-            <% } else { %>
-                <div class="alert alert-warning"><a href="/login?redirect=<%=currentRoute%>">Login</a> or <a href="/register?redirect=<%=currentRoute%>">sign up</a> to comment and see the discussion!</div>
             <% } %>
         </ul>
     </div>

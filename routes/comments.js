@@ -76,7 +76,7 @@ router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
             Article.findById(req.params.id, (err, article) => {
                 var newComments = []
                 var objectId = mongoose.Types.ObjectId(req.params.comment_id);
-                numComments = article.comments.length;
+                var numComments = article.comments.length;
                 var counter = 0;
                 article.comments.forEach((comment) => {
                     if (!comment.id.equals(objectId.id)) {
