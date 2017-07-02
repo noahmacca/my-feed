@@ -12,10 +12,10 @@
                 </form>
             <% } %>
             <h2>
-                <a href="<%=article.url%>"><%= article.title %></a>
+                <%= article.title %>
             </h2>
-            <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
-            <p><%= article.articleDesc %></p>
+            <p><small><%= article.publication %></small></p>
+            <p><%= article.articleDesc %> (<a href="<%=article.url%>">Read More</a>)</p>
             <p>Posted by <%= article.author.username %> on <%= moment(article.createdAt).format(momentFormat) %></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>

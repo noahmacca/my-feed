@@ -17,7 +17,10 @@
             </ul>
         </div>
         <div class="col-md-9">
-                <% articles.forEach((function(article, index) { %>
+            <% if (articles.length == 0) { %>
+                <a href="/articles/new" class="btn btn-block btn-lg btn-info" style="margin-top: 30%; padding: 1.0em;">Post an article or add some friends to populate your feed!</a>
+            <% } else { %>
+                <% articles.reverse().forEach((function(article, index) { %>
                     <div class="panel panel-default" style="margin-bottom: 5px;">
                         <div class="panel-body" style="padding-bottom: 0px;">
                             <h3 style="margin-top: 5px;">
@@ -41,8 +44,8 @@
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <h4><a href="<%=article.url%>"><%= article.title %></a></h4>
-                                    <p><small><%= article.articleAuthor %> | <%= article.publication %></small></p>
-                                    <p><em><%= article.articleDesc %></em></p>
+                                    <p><small><%= article.publication %></small></p>
+                                    <p><em><%= article.articleDesc %></em>...</p>
                                 </div>
                             </div>
                         </div>
@@ -58,6 +61,7 @@
                         </div>
                     </div>
                 <% })); %>
+            <% } %>
         </div>
     </div>
 </div>

@@ -4,27 +4,16 @@
     <div class="row">
         <h1 style="text-align: center;">Post a New Article</h1>
         <p style="text-align: center;"><em>Coming soon: automatic URL parsing</em></p>
+        <p id="url-content"></p>
         <div style="margin: 25px auto; width: 50%;">
             <form action="/articles" method="POST">
                 <div class="form-group">
-                    <input class="form-control" type="text" name="article[title]" placeholder="Article Title">
+                    <input class="form-control" type="text" name="url" placeholder="Url">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="article[publication]" placeholder="publication">
+                    <textarea class="form-control" rows="10" type="textarea" name="desc" placeholder="Your Comments"></textarea>
                 </div>
-                <div class="form-group">
-                    <input class="form-control" type="text" name="article[articleAuthor]" placeholder="author">
-                </div>
-                <div class="form-group">
-                    <input class="form-control" type="text" name="article[url]" placeholder="Article URL">
-                </div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="10" name="article[articleDesc]" placeholder="Site Blurb"></textarea>
-                </div>
-                <div class="form-group">
-                    <textarea class="form-control" rows="10" type="textarea" name="article[desc]" placeholder="Your Comments"></textarea>
-                </div>
-                <div class="form-group">
+            <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Submit!</button>
                 </div>
             </form>

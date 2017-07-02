@@ -3,6 +3,10 @@ var express = require("express");
 var router = express.Router();
 var Article = require("../models/article");
 var middleware = require("../middleware");
+var request = require('request');
+var cheerio = require("cheerio");
+
+
 
 // INDEX - show article feed
 router.get("/", middleware.isLoggedIn, (req, res) => {
@@ -24,20 +28,46 @@ router.get("/new", middleware.isLoggedIn, (req, res) => {
 
 // CREATE - Add new article
 router.post("/", middleware.isLoggedIn, (req, res) => {
-    var article = req.body.article;
-    article.createdAt = moment().format();
-    article.author = {
-        id: req.user._id,
-        username: req.user.username
+    if (!req.body.url) {
+        req.flash("error", "Please specify a url for the article you'd like to post!");
+        return res.redirect("back");
     }
-    Article.create(article, (err, newArticle) => {
-        if (err) {
-            console.log(err);
-            req.flash("error", `Error creating article: ${err}`);
-        } else {
-            req.flash("success", "New Post Created");
-            res.redirect(`/articles/${newArticle._id}`);
+    var url = req.body.url.startsWith("http") ? req.body.url : "http://" + req.body.url;
+
+    var article = {
+        url: url,
+        desc: req.body.desc,
+        createdAt: moment().format(),
+        author: {
+            id: req.user._id,
+            username: req.user.username
         }
+    }
+    
+    // query the provided url to get the title, snippet etc.
+    request(url, (err, response, body) => {
+        if(err) {
+            req.flash("error", err.message);
+            res.redirect("back");
+        }
+        var $ = cheerio.load(body);
+        
+        article.title = $("title").text().split("|")[0]; // todo: filter out all of the other junk that can be in titles
+        var pTags = []
+        $("body p").each((i, elem) => {
+            pTags[i] = $(elem).text();
+        });
+        article.articleDesc = pTags.join(" ").split(" ").slice(0,100).join(" "); // Not perfect at handling various spaces 
+        article.publication = url.split("/")[2];
+        Article.create(article, (err, newArticle) => {
+            if (err) {
+                req.flash("error", err);
+                res.redirect("back");
+            } else {
+                req.flash("success", "New Post Created");
+                res.redirect(`/articles/${newArticle._id}`);
+            }
+        })
     });
 });
 
@@ -97,6 +127,5 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
         }
     });
 });
-
 
 module.exports = router;

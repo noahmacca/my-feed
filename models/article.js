@@ -4,7 +4,6 @@ var articleSchema = new mongoose.Schema({
     url: String,
     title: String,
     publication: String,
-    articleAuthor: String,
     articleDesc: String,
     desc: String,
     createdAt: String,

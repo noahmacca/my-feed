@@ -9,9 +9,10 @@
                 Joined on <%= moment(user.createdAt).format("MMMM D, YYYY") %>. 
                 Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
             </p>
+            
         </div>
         <div>
-            <% articles.forEach((function(article, index) { %>
+            <% articles.reverse().forEach((function(article, index) { %>
                 <div class="panel panel-default" style="margin-bottom: 5px;">
                     <div class="panel-body text-left" style="padding-bottom: 0px;">
                         <h4>
