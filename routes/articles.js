@@ -6,9 +6,7 @@ var middleware = require("../middleware");
 var request = require('request');
 var cheerio = require("cheerio");
 
-
-
-// INDEX - show article feed
+// INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
         if (err) {
@@ -16,7 +14,28 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
             req.flash("error", `Error getting articles from db: ${err}`);
             res.redirect("back");
         } else {
-            res.render("articles/index", { articles: allArticles });
+            var validArticles = [];
+            for (var i=0; i < allArticles.length; i++) {
+                if(isFolloweeInArray(req.user.following, allArticles[i].author)) {
+                    validArticles.push(allArticles[i]);
+                }
+            }
+            // check each article's author against user's following list
+            res.render("articles/index", { articles: validArticles, allArticles: false });
+        }
+    });
+});
+
+// INDEX - show article feed of all users
+router.get("/all", middleware.isLoggedIn, (req, res) => {
+    Article.find({}, (err, allArticles) => {
+        if (err) {
+            console.log(err);
+            req.flash("error", `Error getting articles from db: ${err}`);
+            res.redirect("back");
+        } else {
+            // check each article's author against user's following list
+            res.render("articles/index", { articles: allArticles, allArticles: true});
         }
     });
 });
@@ -24,7 +43,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
 // New Article Form
 router.get("/new", middleware.isLoggedIn, (req, res) => {
     res.render("articles/new");
-})
+});
 
 // CREATE - Add new article
 router.post("/", middleware.isLoggedIn, (req, res) => {
@@ -129,3 +148,12 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
 });
 
 module.exports = router;
+
+function isFolloweeInArray(followingArray, followee) {
+    for (var i=0; i < followingArray.length; i++) {
+        if (followingArray[i]._id.equals(followee.id)) {
+            return true
+        }
+    }
+    return false
+}

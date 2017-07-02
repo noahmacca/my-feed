@@ -1,6 +1,5 @@
 <% include ../partials/header %>
 
-
 <div class="container">
     <div class="row col-lg-12">
         <div class="page-header">
@@ -11,9 +10,8 @@
         <div class="col-md-3">
             <h3>Feed Filters</h3>
             <ul class="nav nav-pills nav-stacked">
-                <li role="presentation" class="active"><a href="#">Friends</a></li>
-                <li role="presentation"><a href="#">Mine</a></li>
-                <li role="presentation"><a href="#">Recommended</a></li>
+                <li id="feed-following" role="presentation"><a href="/articles">Following</a></li>
+                <li id="feed-all" role="presentation"><a href="/articles/all">All Users</a></li>
             </ul>
         </div>
         <div class="col-md-9">
@@ -67,7 +65,13 @@
 </div>
 
 <script>
-
+    var allArticles = <%=allArticles%>;
+    console.log(allArticles);
+    if (allArticles === true) {
+        $("#feed-all").addClass("active");
+    } else {
+        $("#feed-following").addClass("active");
+    }
 </script>
 
 <% include ../partials/footer %>
