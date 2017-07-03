@@ -28,6 +28,9 @@ router.post("/register", (req, res) => {
             req.flash("error", err.message);
             return res.redirect(`/register${req.query.redirect && req.query.redirect !== "/articles" ? "/?redirect=" + req.query.redirect : ""}`);
         }
+        // everyone follows themself
+        user.following.push(user);
+        user.save();
         passport.authenticate("local")(req, res, () => {
             req.flash("success", `Welcome to MyFeed ${user.username}`);
             return res.redirect(`${req.query.redirect}`);

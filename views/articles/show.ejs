@@ -31,7 +31,7 @@
                 <li class="media">
                     <div class="media-body">
                         <h4 class="media-heading">
-                            <%= article.author.username %>
+                            <%= article.author.username %> (OP)
                         </h4>
                         <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
                         <p><%= article.desc %></p>
@@ -46,6 +46,9 @@
                             <div class="media-body">
                                 <h4 class="media-heading">
                                     <%= comment.author.username %>
+                                    <% if (comment.author.username == article.author.username) { %>
+                                        <span> (OP)</span>
+                                    <% } %>
                                 </h4>
                                 <p><em><%= moment(comment.createdAt).format(momentFormat) %></em></p>
                                 <p><%= comment.text %></p>

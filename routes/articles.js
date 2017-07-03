@@ -9,6 +9,7 @@ var cheerio = require("cheerio");
 // INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
+        allArticles = allArticles.slice(0, 40);
         if (err) {
             console.log(err);
             req.flash("error", `Error getting articles from db: ${err.message}`);
@@ -29,6 +30,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
 // INDEX - show article feed of all users
 router.get("/all", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
+        allArticles = allArticles.slice(0, 40); // todo: introduce multi-page
         if (err) {
             console.log(err);
             req.flash("error", `Error getting articles from db: ${err.message}`);
