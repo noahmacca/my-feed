@@ -5,45 +5,72 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta charset="utf-8">
+
+        <!-- jQuery -->
+        <script src="/vendor/jquery/jquery.js"></script>
         
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="/stylesheets/main.css">
+        <!-- Theme CSS -->
+        <link href="/stylesheets/grayscale.css" rel="stylesheet">
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Custom Stylesheet -->
+        <link href="/stylesheets/main.css" rel="stylesheet">
+        
+        <!-- Custom Fonts -->
+        <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
     </head>
-    <body>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
+    <body id="page-top" data-spy="scroll" data-target=".navbar-custom-page">
+ 
+        <!-- Navigation -->
+        <nav class="navbar navbar-custom-in-app" role="navigation">
+            <div class="container">
                 <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                        Menu <i class="fa fa-bars"></i>
+                    </button>
                     <% if(!currentUser){ %>
-                        <a class="navbar-brand" href="/">MyFeed</a>
+                        <a class="navbar-brand page-scroll" href="/"><span class="light">MyFeed</span></a>
                     <% } else { %>
-                        <a class="navbar-brand" href="/articles">MyFeed</a>
+                        <a class="navbar-brand page-scroll" href="/articles"><span class="light">MyFeed</span>
                     <% } %>
+                    
                 </div>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                    <ul class="nav navbar-nav">
+                        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                        <li class="hidden">
+                        <a href="/articles"></a>
+                        </li>
                         <% if(!currentUser){ %>
                             <li><a href="/login">Login</a></li>
                             <li><a href="/register">Sign Up</a></li>
                         <% } else { %>
-                            <li><a href="/user/<%= currentUser.id %>">Signed in as <%= currentUser.username %></a></li>
+                            <li><a href="/user/<%= currentUser.id %>"><%= currentUser.username %></a></li>
                             <li><a href="/articles/new">Post Article</a></li>
                             <li><a href="/logout">Logout</a></li>
                         <% } %>
                     </ul>
                 </div>
+                <!-- /.navbar-collapse -->
             </div>
+            <!-- /.container -->
         </nav>
 
         <div class="container">
             <div class="row">
                 <% if(error && error.length > 0) {  %>
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger flash" role="alert">
                         <%= error %>
                     </div>
                 <% } else if(success && success.length > 0) { %>
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-success flash" role="alert">
                         <%= success %>
                     </div>
                 <% } %>
