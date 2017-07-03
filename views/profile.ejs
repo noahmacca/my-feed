@@ -57,13 +57,14 @@
             <% })); %>
         </div>
         <div>
-            <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
-                <p>
-                    <form action="/user/unfollow/<%= user._id %>/" method="POST">
+            <p>
+                <form action="/user/unfollow/<%= user._id %>/" method="POST">
+                    <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
                         <button class="btn btn-danger btn-lg"></span>Unfollow</button>
-                    </form>
-                </p>
-            <% } %>
+                    <% } %>
+                    <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
+                </form>
+            </p>
         </div>
     </div>
 </div>

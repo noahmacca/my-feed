@@ -15,7 +15,10 @@
                 <%= article.title %>
             </h2>
             <p><small><%= article.publication %></small></p>
-            <p><%= article.articleDesc %> (<a href="<%=article.url%>">Read More</a>)</p>
+            <p>
+                <%= article.articleDesc %>... 
+                (<a href="<%=article.url%>">Read More</a>)
+            </p>
             <p><strong>Posted by <%= article.author.username %> on <%= moment(article.createdAt).format(momentFormat) %></strong></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
@@ -23,44 +26,54 @@
         </div>
     </div>
     <div class="row">
-        <ul class="media-list">
-            <li class="media">
-                <div class="media-body">
-                    <h4 class="media-heading">
-                        <%= article.author.username %>
-                    </h4>
-                    <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
-                    <p><%= article.desc %></p>
-                </div>
-            </li>
-            <hr>
-            <% if (!currentUser) { %>
-                <div class="alert alert-warning"><a href="/login?redirect=<%=currentRoute%>">Login</a> or <a href="/register?redirect=<%=currentRoute%>">sign up</a> to comment and see the discussion!</div>
-            <% } else { %>
-                 <% article.comments.forEach(function(comment) { %>
-                    <li class="media">
-                        <div class="media-body">
-                            <h4 class="media-heading">
-                                <%= comment.author.username %>
-                            </h4>
-                            <p><em><%= moment(comment.createdAt).format(momentFormat) %></em></p>
-                            <p><%= comment.text %></p>
-                            <% if (currentUser && comment.author.id && comment.author.id.equals(currentUser._id)) { %>
-                                <form class="pull-left" action="/articles/<%= article._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
-                                    <button class="btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                                </form>
-                                <a href="/articles/<%= article._id %>/comments/<%= comment._id %>/edit" type="button" class="btn btn-default btn-xs pull-left">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
-                                </a>
-                            <% } %>
-                        </div>
-                    </li>
-                <% }); %>
-                <p class="text-center">
-                    <a class="btn btn-success" href="/articles/<%= article._id %>/comments/new">New Comment</a>
-                </p>
-            <% } %>
-        </ul>
+        <div class="col-md-6">
+            <ul class="media-list">
+                <li class="media">
+                    <div class="media-body">
+                        <h4 class="media-heading">
+                            <%= article.author.username %>
+                        </h4>
+                        <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
+                        <p><%= article.desc %></p>
+                    </div>
+                </li>
+                <hr>
+                <% if (!currentUser) { %>
+                    <div class="alert alert-warning"><a href="/login?redirect=<%=currentRoute%>">Login</a> or <a href="/register?redirect=<%=currentRoute%>">sign up</a> to comment and see the discussion!</div>
+                <% } else { %>
+                    <% article.comments.forEach(function(comment) { %>
+                        <li class="media">
+                            <div class="media-body">
+                                <h4 class="media-heading">
+                                    <%= comment.author.username %>
+                                </h4>
+                                <p><em><%= moment(comment.createdAt).format(momentFormat) %></em></p>
+                                <p><%= comment.text %></p>
+                                <% if (currentUser && comment.author.id && comment.author.id.equals(currentUser._id)) { %>
+                                    <form class="pull-left" action="/articles/<%= article._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
+                                        <button class="btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                    </form>
+                                    <a href="/articles/<%= article._id %>/comments/<%= comment._id %>/edit" type="button" class="btn btn-default btn-xs pull-left">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                    </a>
+                                <% } %>
+                            </div>
+                        </li>
+                    <% }); %>
+                    <!--<p class="text-center">
+                        <a class="btn btn-success" href="/articles/<%= article._id %>/comments/new">New Comment</a>
+                    </p>-->
+                    <div style="margin-top: 30px;">
+                        <form action="/articles/<%= article._id %>/comments" method="POST">
+                            <input class="form-control" type="text" name="comment[text]" placeholder="Comment">
+                            <div class="margin-top: 55px;">
+                                <button class="btn btn-md btn-default">Add Comment</button>
+                            </div>
+                        </form>
+                    </div>
+                <% } %>
+            </ul>
+        </div>
     </div>
 </div>
 

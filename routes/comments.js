@@ -8,18 +8,6 @@ var moment = require("moment");
 
 router.use(middleware.isLoggedIn);
 
-// CREATE COMMENT FORM
-router.get("/new", (req, res) => {
-    Article.findById(req.params.id, (err, article) => {
-        if (err) {
-            req.flash("error", `Error loading create comment form: ${err.message}`);
-            return res.redirect("back");
-        } else {
-            return res.render("comments/new", {article: article})
-        }
-    });
-});
-
 // CREATE COMMENT LOGIC
 router.post("/", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
