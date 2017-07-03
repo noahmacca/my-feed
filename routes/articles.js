@@ -78,7 +78,7 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
         $("body p").each((i, elem) => {
             pTags[i] = $(elem).text();
         });
-        article.articleDesc = pTags.join(" ").split(" ").slice(0,100).join(" "); // Not perfect at handling various spaces 
+        article.articleDesc = pTags.join(" ").split(" ").slice(0,50).join(" "); // Not perfect at handling various spaces 
         article.publication = url.split("/")[2];
         Article.create(article, (err, newArticle) => {
             if (err) {

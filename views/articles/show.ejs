@@ -1,7 +1,7 @@
 <% include ../partials/header %>
 
 <div class="container">
-    <div class="row">
+    <div class="row top-div">
         <div class="jumbotron">
             <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
                 <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-md pull-right">

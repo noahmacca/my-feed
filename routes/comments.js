@@ -27,7 +27,7 @@ router.post("/", (req, res) => {
                 } else {
                     article.comments.push(comment);
                     article.save();
-                    req.flash("success", "Successfully added comment");
+                    req.flash("success", "Posted comment");
                     return res.redirect(`/articles/${article._id}`);
                 }
             });
