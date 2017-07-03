@@ -9,13 +9,13 @@ var mongoose = require("mongoose");
 
 // Landing page
 router.get("/", (req, res) => {
-    res.render("landing");
+    return res.render("landing");
 });
 
 // Sign up page
 router.get("/register", (req, res) => {
     var redirect = req.query.redirect ? req.query.redirect : "/articles"
-    res.render("register", {redirect: redirect});
+    return res.render("register", {redirect: redirect});
 });
 
 // Sign up logic
@@ -25,13 +25,12 @@ router.post("/register", (req, res) => {
     newUser.createdAt = moment().format();
     User.register(newUser, req.body.password, (err, user) => {
         if (err) {
-            console.log(`Error logging in: ${err.message}`);
             req.flash("error", err.message);
             return res.redirect(`/register${req.query.redirect && req.query.redirect !== "/articles" ? "/?redirect=" + req.query.redirect : ""}`);
         }
         passport.authenticate("local")(req, res, () => {
             req.flash("success", `Welcome to MyFeed ${user.username}`);
-            res.redirect(`${req.query.redirect}`);
+            return res.redirect(`${req.query.redirect}`);
         });
     });
 });
@@ -46,8 +45,7 @@ router.get("/login", (req, res) => {
 router.post("/login", (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if(err) {
-            console.log(err) // 500 error
-            req.flash("error", err);
+            req.flash("error", err.message); // todo: should probably throw here
             return res.redirect("/login");
         }
         if(!user) {
@@ -78,7 +76,7 @@ router.get("/user/:id", (req, res) => {
     // get user's profile information
     User.findById(req.params.id, (err, user) => {
         if (err) {
-            req.flash("error", `Error fetching user: ${err}`);
+            req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
             // Get all articles
@@ -112,7 +110,7 @@ router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
     // load the person's follow list
     User.findById(req.user._id, (err, user) => {
         if(err) {
-            req.flash("error", `Error fetching user: ${err}`);
+            req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
             // Look up the followee add them to the list
@@ -139,7 +137,7 @@ router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
     // load the user's information
     User.findById(req.user._id, (err, user) => {
         if(err) {
-            req.flash("error", `Error fetching user: ${err}`);
+            req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
             var newFollowees = []

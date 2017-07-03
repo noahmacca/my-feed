@@ -12,9 +12,10 @@ router.use(middleware.isLoggedIn);
 router.get("/new", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         if (err) {
-            console.log(err);
+            req.flash("error", `Error loading create comment form: ${err.message}`);
+            return res.redirect("back");
         } else {
-            res.render("comments/new", {article: article})
+            return res.render("comments/new", {article: article})
         }
     });
 });
@@ -23,8 +24,8 @@ router.get("/new", (req, res) => {
 router.post("/", (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         if(err) {
-            console.log(err);
-            res.redirect("/articles");
+            req.flash("error", `Error creating comment: ${err.message}`);
+            return res.redirect("back");
         } else {
             var comment = req.body.comment;
             comment.createdAt = moment().format();
@@ -39,7 +40,7 @@ router.post("/", (req, res) => {
                     article.comments.push(comment);
                     article.save();
                     req.flash("success", "Successfully added comment");
-                    res.redirect(`/articles/${article._id}`);
+                    return res.redirect(`/articles/${article._id}`);
                 }
             });
         }
@@ -49,7 +50,7 @@ router.post("/", (req, res) => {
 // EDIT COMMENT FORM
 router.get("/:comment_id/edit", middleware.checkCommentOwnership, (req, res) => {
     Comment.findById(req.params.comment_id, (err, comment) => {
-        res.render("comments/edit", { articleId: req.params.id, comment: comment });
+        return res.render("comments/edit", { articleId: req.params.id, comment: comment });
     });
 });
 
@@ -57,10 +58,11 @@ router.get("/:comment_id/edit", middleware.checkCommentOwnership, (req, res) => 
 router.put("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, comment) => {
         if (err) {
-            res.redirect("/articles"); // todo: handle this better
+            req.flash("error", `Error updating comment: ${err.message}`);
+            return res.redirect("back");
         } else {
             req.flash("success", "Updated comment!");
-            res.redirect(`/articles/${req.params.id}`);
+            return res.redirect(`/articles/${req.params.id}`);
         }
     });
 });
@@ -69,8 +71,8 @@ router.put("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
 router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
     Comment.findByIdAndRemove(req.params.comment_id, (err) => {
         if (err) {
-            res.redirect("/articles");
-            console.log("error: ", err); // todo: better error handling
+            req.flash("error", `Error deleting comment: ${err.message}`);
+            return res.redirect("back");
         } else {
             // Remove comment from article's comment array (there's probably a better way to do this)
             Article.findById(req.params.id, (err, article) => {
@@ -87,7 +89,7 @@ router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
                         article.comments = newComments;
                         article.save();
                         req.flash("success", "Deleted comment");
-                        res.redirect(`/articles/${article._id}`);
+                        return res.redirect(`/articles/${article._id}`);
                     }
                 });
             });

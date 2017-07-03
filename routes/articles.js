@@ -11,8 +11,8 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
         if (err) {
             console.log(err);
-            req.flash("error", `Error getting articles from db: ${err}`);
-            res.redirect("back");
+            req.flash("error", `Error getting articles from db: ${err.message}`);
+            return res.redirect("back");
         } else {
             var validArticles = [];
             for (var i=0; i < allArticles.length; i++) {
@@ -21,7 +21,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
                 }
             }
             // check each article's author against user's following list
-            res.render("articles/index", { articles: validArticles, allArticles: false });
+            return res.render("articles/index", { articles: validArticles, allArticles: false });
         }
     });
 });
@@ -31,11 +31,11 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
         if (err) {
             console.log(err);
-            req.flash("error", `Error getting articles from db: ${err}`);
-            res.redirect("back");
+            req.flash("error", `Error getting articles from db: ${err.message}`);
+            return res.redirect("back");
         } else {
             // check each article's author against user's following list
-            res.render("articles/index", { articles: allArticles, allArticles: true});
+            return res.render("articles/index", { articles: allArticles, allArticles: true});
         }
     });
 });
@@ -81,10 +81,10 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
         Article.create(article, (err, newArticle) => {
             if (err) {
                 req.flash("error", err);
-                res.redirect("back");
+                return res.redirect("back");
             } else {
                 req.flash("success", "New Post Created");
-                res.redirect(`/articles/${newArticle._id}`);
+                return res.redirect(`/articles/${newArticle._id}`);
             }
         })
     });
@@ -95,10 +95,10 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
 router.get("/:id", (req, res) => {
     Article.findById(req.params.id).populate("comments").exec((err, foundArticle) => {
         if (err) {
-            req.flash("error", `Error finding article: ${err}`);
-            console.log(err);
+            req.flash("error", `Error finding article: ${err.message}`);
+            return res.redirect("back");
         } else {
-            res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl });
+            return res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl });
         }
     });
 });
@@ -107,10 +107,10 @@ router.get("/:id", (req, res) => {
 router.get("/:id/edit", middleware.isLoggedIn, middleware.checkPostOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
         if(err) {
-            req.flash("error", `Error finding article: ${err}`);
-            res.redirect("back");
+            req.flash("error", `Error finding article: ${err.message}`);
+            return res.redirect("back");
         } else {
-            res.render("articles/edit", { article: article });
+            return res.render("articles/edit", { article: article });
         }
     });
 });
@@ -124,11 +124,11 @@ router.put("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req, r
     }
     Article.findByIdAndUpdate(req.params.id, article, (err, article) => {
         if (err) {
-            req.flash("error", `Error updating article: ${err}`);
-            res.redirect("/articles"); // todo: handle this better
+            req.flash("error", `Error updating article: ${err.message}`);
+            return res.redirect("back");
         } else {
             req.flash("success", "Post Updated");
-            res.redirect(`/articles/${req.params.id}`);
+            return res.redirect(`/articles/${req.params.id}`);
         }
     });
 });
@@ -137,12 +137,11 @@ router.put("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req, r
 router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req, res) => {
     Article.findByIdAndRemove(req.params.id, (err) => {
         if (err) {
-            req.flash("error", `Error deleting article: ${err}`)
-            res.redirect("/articles");
-            console.log("error: ", err); // todo: better error handling
+            req.flash("error", `Error deleting article: ${err.message}`)
+            return res.redirect("/articles");
         } else {
             req.flash("success", "Post Deleted");
-            res.redirect("/articles");
+            return res.redirect("/articles");
         }
     });
 });
