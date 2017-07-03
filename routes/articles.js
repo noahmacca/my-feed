@@ -143,7 +143,7 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
             return res.redirect("/articles");
         } else {
             req.flash("success", "Post Deleted");
-            return res.redirect("/articles");
+            return res.redirect("back");
         }
     });
 });

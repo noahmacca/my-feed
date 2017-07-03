@@ -254,6 +254,9 @@ a:focus {
     margin-top: 250px;
   }
 }
+.btn-wide {
+  width: 200px;
+}
 .btn {
   text-transform: uppercase;
   font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -261,7 +264,7 @@ a:focus {
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
-  border-radius: 0;
+  border-radius: 4px;
 }
 .btn-default {
   border: 1px solid #89C4F4;
