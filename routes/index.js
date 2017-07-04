@@ -9,6 +9,9 @@ var mongoose = require("mongoose");
 
 // Landing page
 router.get("/", (req, res) => {
+    if (req.isAuthenticated()) {
+        return res.redirect("/articles");
+    }
     return res.render("landing");
 });
 
