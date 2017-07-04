@@ -12,91 +12,106 @@
 %>
 
 <div class="container">
-    <div class="row col-lg-8 col-md-offset-2 text-center">
-        <div class="page-header">
-            <h1><%= user.username %>'s posts</h1>
-            <p>
-                Joined on <span style="display: none;" id="moment"><%= user.createdAt %></span>. 
-                Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.
-                Following <%= user.following.length - 1 %> users. Followed by <%= user.followers.length %> users.
-            </p>
-            <% if (!currentUser) { %>
-                <p>
-                    <form action="/login" method="GET">
-                        <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
-                    </form>
-                </p>
-            <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
-                <p>
-                    <form action="/user/follow/<%= user._id %>/" method="POST">
-                        <button class="btn btn-default btn-lg btn-wide"></span>Follow</button>
-                    </form>
-                </p>
-            <% } %>
-        </div>
-        <div>
-            <% articles.reverse().forEach((function(article, index) { %>
-                <div class="panel panel-default" style="margin-bottom: 5px;">
-                    <div class="panel-body text-left" style="padding-bottom: 0px;">
-                        <h4>
-                            <a href="<%=article.url%>"><%= article.title %></a>
-                        </h4>
-                        <div><small><%= article.publication %></small></div>
-                        <p>
-                            <small>posted on <span style="display: none;" id="moment"><%= article.createdAt %></span></small>
-                        </p>
-                        <p><em><%= article.articleDesc %></em></p>
-                    </div>
-                    <div class="panel-footer text-left">                            
-                        <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
-                            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
-                        </a>
-
-                        <% if (currentUser && isInMongoArray(currentUser.savedArticles, article._id)) { %>
-                            <form action="/articles/unsave/<%= article._id%>" method="POST" class="pull-left">
-                                <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Unsave</button>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-header">
+                <div class="pull-right">
+                    <p>
+                        <% if (!currentUser) { %>
+                            <form action="/login" method="GET">
+                                <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
                             </form>
-                        <% } else { %>
-                            <form action="/articles/save/<%= article._id%>" method="POST" class="pull-left">
-                                <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Save</button>
+                        <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
+                            <form action="/user/follow/<%= user._id %>/" method="POST">
+                                <button class="btn btn-default btn-lg btn-wide"></span>Follow</button>
+                            </form>
+                        <% } else if ((user.username !== currentUser.username) && (isFollowing)) { %>
+                            <form action="/user/unfollow/<%= user._id %>/" method="POST">
+                                <button class="btn btn-warning btn-lg btn-wide"></span>Unfollow</button>
                             </form>
                         <% } %>
-                        
-                        <button id="share-button" class="btn btn-default btn-sm btn-sm-wide" onclick="showShareLink(<%=index%>)">
-                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
-                        </button>
-                        <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
-                            <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                                <button class="btn btn-default btn-sm btn-sm-wide pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                            </form>
-                            <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm btn-sm-wide pull-right">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
-                            </a>
-                        <% } %>
-                        <span id="copied-message" style="margin-left: 1.0em; display: none;">Copied!</span>
-                        <input id="share-link" style="margin-top: 10px; display: none;" class="form-control" type="text" value="http://www.myfeed.cool/articles/<%=article._id%>"></input>
-                    </div>
+                    </p>
                 </div>
-            <% })); %>
+                <h1>
+                    <%= user.username %>
+                </h1>
+                <h4 style="font-weight: 400;">[personal tagline here]</h4>
+            </div>
         </div>
-        <div>
-            <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
-                <form style="display: inline-block" action="/user/unfollow/<%= user._id %>/" method="POST">
-                    <button class="btn btn-warning btn-lg btn-wide"></span>Unfollow</button>
-                </form>
-            <% } %>
-            <a class="btn btn-primary btn-lg btn-wide" href="/articles" role="button">Back to Feed</a>
-            <% if ((currentUser) && (user.username == currentUser.username)) { %>
-                <form onsubmit="return confirm('Are you sure? Your posts will still be visible; delete them first if you want them gone as well.')" style="display: inline-block" action="/user/<%= user._id %>/?_method=DELETE" method="POST">
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <h4>Joined: <span style="display: none;" id="moment"><%= user.createdAt %></span></h4>
+            <h4><%= articles.length %> posts</h4>
+            <h4><%= user.following.length - 1 %> following</h4>
+            <h4><%= user.followers.length %> follwers</h4>
+            <% if ((currentUser) && (user.id == currentUser.id)) { %>
+                <form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">
                     <button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>
                 </form>
             <% } %>
+        </div>
+        <div class="col-md-9">
+            <div>
+                <% articles.reverse().forEach((function(article, index) { %>
+                    <div class="panel panel-default" style="margin-bottom: 5px;">
+                        <div class="panel-body text-left" style="padding-bottom: 0px;">
+                            <h4>
+                                <a href="<%=article.url%>"><%= article.title %></a>
+                            </h4>
+                            <div><small><%= article.publication %></small></div>
+                            <p>
+                                <small>posted on <span style="display: none;" id="moment"><%= article.createdAt %></span></small>
+                            </p>
+                            <p><em><%= article.articleDesc %></em></p>
+                        </div>
+                        <div class="panel-footer text-left">                            
+                            <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
+                            </a>
+
+                            <% if (currentUser && isInMongoArray(currentUser.savedArticles, article._id)) { %>
+                                <form action="/articles/unsave/<%= article._id%>" method="POST" class="pull-left">
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Unsave</button>
+                                </form>
+                            <% } else { %>
+                                <form action="/articles/save/<%= article._id%>" method="POST" class="pull-left">
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Save</button>
+                                </form>
+                            <% } %>
+                            
+                            <button id="share-button" class="btn btn-default btn-sm btn-sm-wide" onclick="showShareLink(<%=index%>)">
+                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
+                            </button>
+                            <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
+                                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                </form>
+                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm btn-sm-wide pull-right">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                </a>
+                            <% } %>
+                            <span id="copied-message" style="margin-left: 1.0em; display: none;">Copied!</span>
+                            <input id="share-link" style="margin-top: 10px; display: none;" class="form-control" type="text" value="http://www.myfeed.cool/articles/<%=article._id%>"></input>
+                        </div>
+                    </div>
+                <% })); %>
+            </div>
+            <div>
+                <div class="text-center">
+                    <a class="btn btn-primary btn-lg btn-wide" href="/articles" role="button">Back to Feed</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/js/moment.js"></script>
 <script>
+    function deleteConfirm() {
+        return confirm('Are you sure? Your posts will still be visible; delete them first if you want them gone as well.')
+    }
+
     $("[id=moment]").each(function(obj) {
         this.innerHTML = moment(this.innerHTML).local().format("MMMM D, h:mm a");
         this.style.display = "inline";

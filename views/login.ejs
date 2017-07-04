@@ -5,7 +5,7 @@
         <h1 style="text-align: center">Login</h1>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/login/?redirect=<%= redirect %>" method="POST">
-                <input class="form-group form-control" type="text" name="username" placeholder="username">
+                <input id="focus" class="form-group form-control" type="text" name="username" placeholder="username">
                 <input class="form-group form-control" type="password" name="password", placeholder="password">
                 <button class="btn btn-lg btn-primary btn-block">Login</button>
             </form>
@@ -15,5 +15,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    $("#focus").focus();
+</script>
 
 <% include ./partials/footer %>
