@@ -14,11 +14,7 @@
 <div class="container">
     <div class="row col-lg-8 col-md-offset-2 text-center">
         <div class="page-header">
-            <% if(currentUser && currentUser.username == user.username) { %>
-                <h1>Your posts</h1>
-            <% } else { %>
-                <h1><%= user.username %>'s posts</h1>
-            <% } %>
+            <h1><%= user.username %>'s posts</h1>
             <p>
                 Joined on <%= moment(user.createdAt).format("MMMM D, YYYY") %>. 
                 Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
