@@ -16,7 +16,7 @@
         <div class="page-header">
             <h1><%= user.username %>'s posts</h1>
             <p>
-                Joined on <%= moment(user.createdAt).local().format("MMMM D, YYYY") %>. 
+                Joined on <span style="display: none;" id="moment"><%= user.createdAt %></span>. 
                 Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
             </p>
                 <% if (!currentUser) { %>
@@ -42,7 +42,7 @@
                         </h4>
                         <div><small><%= article.publication %></small></div>
                         <p>
-                            <small>posted on <%= moment(article.createdAt).local().format(momentFormat) %></small>
+                            <small>posted on <span style="display: none;" id="moment"><%= article.createdAt %></span></small>
                         </p>
                         <p><em><%= article.articleDesc %></em></p>
                     </div>
@@ -91,6 +91,13 @@
     </div>
 </div>
 
+<script src="/js/moment.js"></script>
+<script>
+    $("[id=moment]").each(function(obj) {
+        this.innerHTML = moment(this.innerHTML).local().format("MMMM D, h:mm a");
+        this.style.display = "inline";
+    });
+</script>
 
 
 <% include ./partials/footer %>

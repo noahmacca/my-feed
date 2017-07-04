@@ -66,8 +66,7 @@
                                     <%= article.author.username %>
                                 </a> 
                                 <div>
-                                    <small>posted on <span id="moment"><%= article.createdAt %></span></small>
-                                    <small>posted on <%= moment(article.createdAt).format() %></small>
+                                    <small>posted on <span style="display: none;" id="moment"><%= article.createdAt %></span></small>
                                 </div>
                             </h3>
                             
@@ -119,9 +118,8 @@
 <script src="/js/moment.js"></script>
 <script>
     $("[id=moment]").each(function(obj) {
-        console.log(obj);
-        console.log(this.innerHTML);
         this.innerHTML = moment(this.innerHTML).local().format("MMMM D, h:mm a");
+        this.style.display = "inline";
     });
 
     function expandForm() {
