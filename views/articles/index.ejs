@@ -35,7 +35,7 @@
             <div id="new-post-form" style="display: none;">
                 <form action="/articles" method="POST" style="margin-bottom: 40px;">
                     <div class="form-group" style="margin-top: 10px;">
-                        <input class="form-control" type="text" name="url" placeholder="Url (include 'http')">
+                        <input id="url-input" class="form-control" type="text" name="url" placeholder="Url (include 'http')">
                     </div>
                     <div class="form-group">
                         <input class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
@@ -124,6 +124,7 @@
 
     function expandForm() {
         $("#new-post-form").show("fast", "swing");
+        $("#url-input").focus();
     }
 
     $("#new-post-button").click(expandForm);

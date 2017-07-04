@@ -65,6 +65,11 @@ footer {
     background-color: #2980b9;
 }
 
+.navbar-custom-in-app .navbar-toggle {
+  color: white;
+  font-size: 12px;
+}
+
 .navbar-custom-in-app {
   border-width: 0 0 1px;
   border-radius: 0;

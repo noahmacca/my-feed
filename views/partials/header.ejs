@@ -45,7 +45,7 @@
         <nav class="navbar navbar-custom-in-app" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <button type="button" class="navbar-custom navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
                         Menu <i class="fa fa-bars"></i>
                     </button>
                     <% if(!currentUser){ %>
@@ -67,7 +67,7 @@
                             <li><a href="/login">Login</a></li>
                             <li><a href="/register">Sign Up</a></li>
                         <% } else { %>
-                            <li><a href="/user/<%= currentUser.id %>"><%= currentUser.username %></a></li>
+                            <li><a href="/user/<%= currentUser.id %>"><%=currentUser.username%></a></li>
                             <li><a href="/articles/new">Post Article</a></li>
                             <li><a href="/logout">Logout</a></li>
                         <% } %>
