@@ -19,7 +19,7 @@
                 <%= article.articleDesc %>... 
                 (<a href="<%=article.url%>">Read More</a>)
             </p>
-            <p><strong>Posted by <%= article.author.username %> on <span style="display: none;" id="moment"><%= article.createdAt %></span></p>
+            <p><strong>Posted by <a href="/user/<%= article.author.id.toString() %>/"><%= article.author.username %></a> on <span style="display: none;" id="moment"><%= article.createdAt %></span></strong></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
             </div>
