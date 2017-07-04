@@ -21,8 +21,9 @@ To run this project:
 Potential names/domains:
 - readie.io
 - friendforum.io
-
-
+- myfeed.fyi
+- myfeed.pub
+- myfeed.us
 
 Hope you enjoy!
 
