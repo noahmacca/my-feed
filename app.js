@@ -31,7 +31,7 @@ app.use(flash());
 
 // PASSPORT CONFIG
 app.use(require("express-session")({
-    secret: "this is a test secret", // todo: change secret to env var
+    secret: process.env.SESSIONSECRET, // todo: change secret to env var
     resave: false,
     saveUninitialized: false
 }));
