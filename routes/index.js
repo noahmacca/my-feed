@@ -79,10 +79,13 @@ router.get("/logout", (req, res) => {
 // unauthed for easy sharing
 router.get("/user/:id", (req, res) => {
     // get user's profile information
-    User.findById(req.params.id, (err, user) => {
+    User.findById({ _id: req.params.id}, (err, user) => {
         if (err) {
             req.flash("error", `Error fetching user: ${err.message}`);
-            res.redirect("back");
+            return res.redirect("back");
+        } else if (!user) {
+            req.flash("error", "This user has deleted their account");
+            return res.redirect("back");
         } else {
             // Get all articles
             Article.find({}, (err, allArticles) => {
@@ -95,13 +98,13 @@ router.get("/user/:id", (req, res) => {
                     counter = 0;
                     // filter out articles that don't belong to this user
                     allArticles.forEach((article) => { // todo: make this more efficient. Won't scale
-                        if (article.author.id.equals(user.id)) {
+                        if (user && article.author.id.equals(user.id)) {
                             articles.push(article);
                         }
                         counter++;
                         if (counter == allArticles.length) {
                             var isFollowing = req.user ? isAlreadyFollowing(req.user.following, user) : false
-                            res.render("profile", { user: user, articles: articles, isFollowing: isFollowing });
+                            return res.render("profile", { user: user, articles: articles, isFollowing: isFollowing });
                         }
                     });
                 }
@@ -163,6 +166,23 @@ router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
             });
         }
     });
+});
+
+// Delete user
+router.delete("/user/:id", middleware.isLoggedIn, (req, res) => {
+    if (req.params.id == req.user.id) {
+        User.remove({ _id: req.params.id }, (err) => {
+            if(err) {
+                req.flash("error", `error deleting account: ${err.message}`)
+                return res.redirect("back");
+            } 
+            req.flash("success", "Account deleted. Hope to see you again someday!")
+            return res.redirect("/");
+        });
+    } else {
+        req.flash("error", `Not authorized to delete an account that isn't yours! ${err.message}`)
+        return res.redirect("back");
+    }
 });
 
 module.exports = router;

@@ -79,14 +79,17 @@
             <% })); %>
         </div>
         <div>
-            <p>
-                <form action="/user/unfollow/<%= user._id %>/" method="POST">
-                    <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
-                        <button class="btn btn-danger btn-lg btn-wide"></span>Unfollow</button>
-                    <% } %>
-                    <a class="btn btn-primary btn-lg btn-wide" href="/articles" role="button">Back to Feed</a>
+            <% if ((currentUser) && (user.username !== currentUser.username) && (isFollowing)) { %>
+                <form style="display: inline-block" action="/user/unfollow/<%= user._id %>/" method="POST">
+                    <button class="btn btn-warning btn-lg btn-wide"></span>Unfollow</button>
                 </form>
-            </p>
+            <% } %>
+            <a class="btn btn-primary btn-lg btn-wide" href="/articles" role="button">Back to Feed</a>
+            <% if ((currentUser) && (user.username == currentUser.username)) { %>
+                <form onsubmit="return confirm('Are you sure? Your posts will still be visible; delete them first if you want them gone as well.')" style="display: inline-block" action="/user/<%= user._id %>/?_method=DELETE" method="POST">
+                    <button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>
+                </form>
+            <% } %>
         </div>
     </div>
 </div>
