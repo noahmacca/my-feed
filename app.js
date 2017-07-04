@@ -19,7 +19,7 @@ var indexRoutes = require("./routes/index");
 var articleRoutes = require("./routes/articles");
 var commentRoutes = require("./routes/comments");
 
-var url = process.env.DATABASEURL || "mongodb://localhost/myfeed";
+var url = process.env.MONGOURL;
 mongoose.connect(url);
 
 app.use(bodyParser.urlencoded({ extended: true }));
