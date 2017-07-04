@@ -25,7 +25,7 @@
             </p>
                 <% if (!currentUser) { %>
                     <p>
-                        <form action="/user/follow/<%= user._id %>/" method="POST">
+                        <form action="/login" method="GET">
                             <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
                         </form>
                     </p>
@@ -55,7 +55,7 @@
                             <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
                         </a>
 
-                        <% if (isInMongoArray(currentUser.savedArticles, article._id)) { %>
+                        <% if (currentUser && isInMongoArray(currentUser.savedArticles, article._id)) { %>
                             <form action="/articles/unsave/<%= article._id%>" method="POST" class="pull-left">
                                 <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Unsave</button>
                             </form>

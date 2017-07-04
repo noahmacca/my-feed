@@ -31,7 +31,9 @@
                 <li class="media">
                     <div class="media-body">
                         <h4 class="media-heading">
-                            <%= article.author.username %> (OP)
+                            <a href="/user/<%= article.author.id.toString() %>/">
+                                <%= article.author.username %>
+                            </a> (OP)
                         </h4>
                         <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
                         <p><%= article.desc %></p>
@@ -45,7 +47,9 @@
                         <li class="media">
                             <div class="media-body">
                                 <h4 class="media-heading">
-                                    <%= comment.author.username %>
+                                    <a href="/user/<%= comment.author.id.toString() %>/">
+                                        <%= comment.author.username %>
+                                    </a> 
                                     <% if (comment.author.username == article.author.username) { %>
                                         <span> (OP)</span>
                                     <% } %>

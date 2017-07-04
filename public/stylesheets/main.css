@@ -4,6 +4,10 @@ p {
     line-height: 1.6;
 }
 
+footer {
+    margin-top: 5%;
+}
+
 .top-div {
     margin-top: 20px;
 }
