@@ -19,7 +19,8 @@ var indexRoutes = require("./routes/index");
 var articleRoutes = require("./routes/articles");
 var commentRoutes = require("./routes/comments");
 
-mongoose.connect("mongodb://localhost/myfeed");
+var url = process.env.DATABASEURL || "mongodb://localhost/myfeed";
+mongoose.connect(url);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -53,6 +54,6 @@ app.use("/", indexRoutes);
 app.use("/articles", articleRoutes);
 app.use("/articles/:id/comments", commentRoutes);
 
-app.listen(3000, (err, res) => {
+app.listen(process.env.PORT, process.env.IP, (err, res) => {
     console.log('server started on port 3000');
 });

@@ -20,7 +20,6 @@ router.get("/register", (req, res) => {
 
 // Sign up logic
 router.post("/register", (req, res) => {
-    console.log(req.body);
     var newUser = new User({ username: req.body.username });
     newUser.createdAt = moment().format();
     User.register(newUser, req.body.password, (err, user) => {
@@ -135,7 +134,7 @@ router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
     });
 });
 
-// Unollow new user
+// Unfollow new user
 router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
     // load the user's information
     User.findById(req.user._id, (err, user) => {
