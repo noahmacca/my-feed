@@ -1,4 +1,5 @@
-# [MyFeed](http://www.myfeed.cool) - The best place to discover, discuss, and share articles with friends.
+# [MyFeed](http://www.myfeed.cool)
+- The best place to discover, discuss, and share articles with friends.
 
 ## Getting Started
 
