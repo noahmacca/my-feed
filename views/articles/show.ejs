@@ -19,7 +19,7 @@
                 <%= article.articleDesc %>... 
                 (<a href="<%=article.url%>">Read More</a>)
             </p>
-            <p><strong>Posted by <%= article.author.username %> on <%= moment(article.createdAt).format(momentFormat) %></strong></p>
+            <p><strong>Posted by <%= article.author.username %> on <%= moment(article.createdAt).local().format(momentFormat) %></strong></p>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
             </div>
@@ -35,7 +35,7 @@
                                 <%= article.author.username %>
                             </a> (OP)
                         </h4>
-                        <p><em><%= moment(article.createdAt).format(momentFormat) %></em></p>
+                        <p><em><%= moment(article.createdAt).local().format(momentFormat) %></em></p>
                         <p><%= article.desc %></p>
                     </div>
                 </li>
@@ -54,7 +54,7 @@
                                         <span> (OP)</span>
                                     <% } %>
                                 </h4>
-                                <p><em><%= moment(comment.createdAt).format(momentFormat) %></em></p>
+                                <p><em><%= moment(comment.createdAt).local().format(momentFormat) %></em></p>
                                 <p><%= comment.text %></p>
                                 <% if (currentUser && comment.author.id && comment.author.id.equals(currentUser._id)) { %>
                                     <form class="pull-left" action="/articles/<%= article._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">

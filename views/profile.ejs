@@ -16,7 +16,7 @@
         <div class="page-header">
             <h1><%= user.username %>'s posts</h1>
             <p>
-                Joined on <%= moment(user.createdAt).format("MMMM D, YYYY") %>. 
+                Joined on <%= moment(user.createdAt).local().format("MMMM D, YYYY") %>. 
                 Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
             </p>
                 <% if (!currentUser) { %>
@@ -42,7 +42,7 @@
                         </h4>
                         <div><small><%= article.publication %></small></div>
                         <p>
-                            <small>posted on <%= moment(article.createdAt).format(momentFormat) %></small>
+                            <small>posted on <%= moment(article.createdAt).local().format(momentFormat) %></small>
                         </p>
                         <p><em><%= article.articleDesc %></em></p>
                     </div>
