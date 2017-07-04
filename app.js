@@ -55,5 +55,5 @@ app.use("/articles", articleRoutes);
 app.use("/articles/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, (err, res) => {
-    console.log('server started on port 3000');
+    console.log(`server started on port ${process.env.PORT}`);
 });

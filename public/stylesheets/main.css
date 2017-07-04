@@ -44,6 +44,22 @@ footer {
   text-transform: capitalize;
 }
 
+#seattle {
+  display: table;
+  width: 100%;
+  height: auto;
+  padding: 100px 0;
+  text-align: center;
+  color: white;
+  background: url(../img/space-needel.jpeg) no-repeat bottom center scroll;
+  opacity: 1.0;
+  background-color: black;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
     color: #fff;
     background-color: #2980b9;
