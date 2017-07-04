@@ -17,21 +17,22 @@
             <h1><%= user.username %>'s posts</h1>
             <p>
                 Joined on <span style="display: none;" id="moment"><%= user.createdAt %></span>. 
-                Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.             
+                Posted <%= articles.length %> Article<%= (articles.length > 1) ? 's' : '' %>.
+                Following <%= user.following.length - 1 %> users. Followed by <%= user.followers.length %> users.
             </p>
-                <% if (!currentUser) { %>
-                    <p>
-                        <form action="/login" method="GET">
-                            <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
-                        </form>
-                    </p>
-                <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
-                    <p>
-                        <form action="/user/follow/<%= user._id %>/" method="POST">
-                            <button class="btn btn-default btn-lg btn-wide"></span>Follow</button>
-                        </form>
-                    </p>
-                <% } %>
+            <% if (!currentUser) { %>
+                <p>
+                    <form action="/login" method="GET">
+                        <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
+                    </form>
+                </p>
+            <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
+                <p>
+                    <form action="/user/follow/<%= user._id %>/" method="POST">
+                        <button class="btn btn-default btn-lg btn-wide"></span>Follow</button>
+                    </form>
+                </p>
+            <% } %>
         </div>
         <div>
             <% articles.reverse().forEach((function(article, index) { %>

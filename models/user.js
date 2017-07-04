@@ -5,8 +5,17 @@ var userSchema = new mongoose.Schema({
     username: String,
     password: String,
     createdAt: String,
-    following: [
+    followers: [
         {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            username: String
+        }
+    ],
+    following: [
+    {
             id: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"

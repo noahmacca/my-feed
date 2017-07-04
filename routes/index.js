@@ -113,8 +113,9 @@ router.get("/user/:id", (req, res) => {
     });
 });
 
-// Follow new user
+// Follow user
 router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
+    // Add the user to your following list, and andd you to the user's follower list
     // load the person's follow list
     User.findById(req.user._id, (err, user) => {
         if(err) {
@@ -125,22 +126,28 @@ router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
             User.findById(req.params.id, (err, followee) => {
                 if (followee._id.equals(user._id)) {
                     req.flash("error", "You can't follow yourself!");
-                    res.redirect(`/user/${followee._id}`);    
+                    return res.redirect(`/user/${followee._id}`);    
                 } else if (isAlreadyFollowing(user.following, followee)) {
                     req.flash("error", "You're already following this person!");
-                    res.redirect(`/user/${followee._id}`);    
+                    return res.redirect(`/user/${followee._id}`);    
                 } else {
+                    // 1. Add the user to your following list
                     user.following.push(followee);
                     user.save();
+                    
+                    // 2. Add you to the user's follower list
+                    followee.followers.push(user);
+                    followee.save();
+                    
                     req.flash("success", `Successfully followed ${followee.username}`);
-                    res.redirect(`/user/${followee._id}`);
+                    return res.redirect(`/user/${followee._id}`);
                 }
             });
         }
     });
 });
 
-// Unfollow new user
+// Unfollow user
 router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
     // load the user's information
     User.findById(req.user._id, (err, user) => {
@@ -148,21 +155,21 @@ router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
             req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
-            var newFollowees = []
-            var removeUserId = mongoose.Types.ObjectId(req.params.id);
-            var numFollows = user.following.length;
-            var counter = 0;
-            user.following.forEach((followee) => {
-                if (!followee._id.equals(removeUserId)) {
-                    newFollowees.push(followee);
+            User.findById(req.params.id, (err, followee) => {
+                if(err) {
+                    req.flash("error", `Error fetching user: ${err.message}`);
+                    return res.redirect("back");
                 }
-                counter++;
-                if (user.following.length === counter) {
-                    user.following = newFollowees;
-                    user.save()
-                    req.flash("success", "Unfollowed!")
-                    res.redirect(`/user/${req.params.id}`);
-                }
+                // 1. Remove from user's following list
+                user.following = removeFromArray(user.following, mongoose.Types.ObjectId(req.params.id));
+                user.save()
+                
+                // 2. Remove from followees follower list
+                followee.followers = removeFromArray(followee.followers, user._id);
+                followee.save()
+
+                req.flash("success", "Unfollowed!");
+                return res.redirect(`/user/${req.params.id}`);
             });
         }
     });
@@ -186,6 +193,17 @@ router.delete("/user/:id", middleware.isLoggedIn, (req, res) => {
 });
 
 module.exports = router;
+
+// Local functions
+function removeFromArray(mongoArray, mongoId) {
+    var newFollowees = []
+    mongoArray.forEach((followee) => {
+        if (!followee._id.equals(mongoId)) {
+            newFollowees.push(followee);
+        }
+    });
+    return newFollowees;
+}
 
 function isAlreadyFollowing(followingArray, followee) {
     for (var i=0; i < followingArray.length; i++) {
