@@ -1,29 +1,26 @@
-# MyFeed
-A place for users to discover and discuss articles with friends. Here are the general features planned for this project:
-- Each user will have their own profile, to which they can easily add articles.
-- Each user will have a feed that shows all of their friends' posts, in chronological order
-- When posting articles you can specifically tag friends to get their input
-- Send a link to an article through MyFeed so your friends can provide inline input to start the discussion.
+# [MyFeed](http://www.myfeed.cool) - The best place to discover, discuss, and share articles with friends.
 
-Therefore, we must build the following pages:
-- User profile
-- Single article discussion page
-- Article feed
+## Getting Started
 
-Other things to build: 
-- Landing page
-- Sign up page
+1. `git clone https://github.com/noahmacca/my-feed.git`
+2. `npm i`
+3. `mongod` (run mongo locally)
+4. `export PORT=8888`
+5. `node app.js`
 
-To run this project:
-- npm i
-- node app.js
+## Bugs and Issues
 
-Potential names/domains:
-- readie.io
-- friendforum.io
-- myfeed.fyi
-- myfeed.pub
-- myfeed.us
+Discover and issue or bug? [Open a new issue](https://github.com/noahmacca/my-feed/issues) on Github.
 
-Hope you enjoy!
+## Creator
+MyFeed was created by and is maintained by **Noah MacCallum**. 
 
+* http://noahmacca.com/
+* https://github.com/noahmacca
+
+### Citations: 
+- The image of glasses on the landing page is by James Sutton, found on [unsplash.com](https://unsplash.com/photos/AcL5SitD8Wg)
+- The landing page was adapted from the open-source template [Grayscale](http://startbootstrap.com/template-overviews/grayscale/) from [Start Bootstrap](http://startbootstrap.com/).
+
+## Copyright and License
+Copyright 2013-2017 Noah Cowan-MacCallum. Code released under the [MIT](https://github.com/noahmacca/my-feed/blob/master/LICENSE) license.
