@@ -15,43 +15,48 @@
 <div class="container">
     <div class="row col-lg-12">
         <div class="page-header">
-            <h1>Article Feed <small>All of your friends' recommendations</small></h1>
+            <h1>Article Feed</h1>
+            <h4 style="font-weight: 400;">All of your friends' recommendations</h4>
         </div>
     </div>
     <div class="row">
         <div class="col-md-3">
             <div>
-                <h3>Feed Filters</h3>
+                <h3>Filters</h3>
                 <ul class="nav nav-pills nav-stacked">
                     <li id="feed-following" role="presentation"><a href="/articles">Following</a></li>
-                    <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved Articles</a></li>
+                    <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved</a></li>
                     <li id="feed-all" role="presentation"><a href="/articles/all">All Users</a></li>
                 </ul>
             </div>
         </div>
         <div class="col-md-9">
+            <button id="new-post-button" style="margin-bottom: 0.5em" class="btn btn-lg btn-default" >New Post</button>
+            <div id="new-post-form" style="display: none;">
+                <form action="/articles" method="POST" style="margin-bottom: 40px;">
+                    <div class="form-group" style="margin-top: 10px;">
+                        <input class="form-control" type="text" name="url" placeholder="Url (include 'http')">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    </div>
+                </form>
+            </div>
             <% if (articles.length == 0) { %>
                    <% if (highlight == "saved") { %>
                         <h4 class="text-center empty-feed">Go save some articles!</h4>
                    <% } else { %>
-                        <a href="/articles/new" class="btn btn-block btn-lg btn-primary empty-feed">Post an article to populate your feed!</a>
+                        <div class="text-center empty-feed">
+                            <h4 onclick="expandForm()">Post an article to populate your feed!</h4>
+                            <p>(e.g. https://techcrunch.com/2017/06/04/when-you-look-into-the-news-feed-the-news-feed-looks-into-you/)</p>
+                        </div>
+                        <!--<a href="/articles/new" class="btn btn-block btn-lg btn-primary empty-feed">Post an article to populate your feed!</a>-->
                    <% } %>
             <% } else { %>
                 <div>
-                    <button id="new-post-button" style="margin-bottom: 0.5em" class="btn btn-lg btn-default" >New Post</button>
-                    <div id="new-post-form" style="display: none;">
-                        <form action="/articles" method="POST" style="margin-bottom: 40px;">
-                            <div class="form-group" style="margin-top: 10px;">
-                                <input class="form-control" type="text" name="url" placeholder="Url (include 'http')">
-                            </div>
-                            <div class="form-group">
-                                <input class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
-                            </div>
-                            <div class="form-group">
-                                <button class="btn btn-lg btn-primary btn-block">Submit</button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
                 <% articles.reverse().forEach((function(article, index) { %>
                     <div class="panel panel-default" style="margin-bottom: 5px;">
@@ -111,12 +116,13 @@
 </div>
 
 <script>
-    $("#new-post-button").click(function() {
+    function expandForm() {
         $("#new-post-form").show("fast", "swing");
-    });
+    }
+
+    $("#new-post-button").click(expandForm);
 
     var highlight = "<%=highlight%>";
-    console.log(highlight);
 
     if (highlight == "following") {
         $("#feed-following").addClass("active");
