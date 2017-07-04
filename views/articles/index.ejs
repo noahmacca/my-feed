@@ -1,5 +1,17 @@
 <% include ../partials/header %>
 
+<!--User-defined js functions for ejs-->
+<%
+    function isInMongoArray(mongoArray, id) {
+        for (var i=0; i < mongoArray.length; i++) {
+            if (mongoArray[i]._id.equals(id)) {
+                return true
+            }
+        }
+        return false
+    }
+%>
+
 <div class="container">
     <div class="row col-lg-12">
         <div class="page-header">
@@ -12,29 +24,31 @@
                 <h3>Feed Filters</h3>
                 <ul class="nav nav-pills nav-stacked">
                     <li id="feed-following" role="presentation"><a href="/articles">Following</a></li>
+                    <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved Articles</a></li>
                     <li id="feed-all" role="presentation"><a href="/articles/all">All Users</a></li>
                 </ul>
-            </div>
-            <div>
-                
             </div>
         </div>
         <div class="col-md-9">
             <% if (articles.length == 0) { %>
-                <a href="/articles/new" class="btn btn-block btn-lg btn-primary" style="margin-top: 30%; padding: 1.0em;">Post an article to populate your feed!</a>
+                   <% if (highlight == "saved") { %>
+                        <h4 class="text-center empty-feed">Go save some articles!</h4>
+                   <% } else { %>
+                        <a href="/articles/new" class="btn btn-block btn-lg btn-primary empty-feed">Post an article to populate your feed!</a>
+                   <% } %>
             <% } else { %>
                 <div>
                     <button id="new-post-button" style="margin-bottom: 0.5em" class="btn btn-lg btn-default" >New Post</button>
                     <div id="new-post-form" style="display: none;">
-                        <form action="/articles" method="POST">
+                        <form action="/articles" method="POST" style="margin-bottom: 40px;">
                             <div class="form-group" style="margin-top: 10px;">
-                                <input class="form-control" type="text" name="url" placeholder="Url">
+                                <input class="form-control" type="text" name="url" placeholder="Url (include 'http')">
                             </div>
                             <div class="form-group">
                                 <input class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-lg btn-primary btn-block">Submit!</button>
+                                <button class="btn btn-lg btn-primary btn-block">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -61,17 +75,28 @@
                             </div>
                         </div>
                         <div class="panel-footer">                            
-                            <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm">
+                            <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
                                 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
                             </a>
-                            <button id="share-button" type="button" class="btn btn-default btn-sm" onclick="showShareLink(<%=index%>)">
+
+                            <% if (isInMongoArray(currentUser.savedArticles, article._id)) { %>
+                                <form action="/articles/unsave/<%= article._id%>" method="POST" class="pull-left">
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Unsave</button>
+                                </form>
+                            <% } else { %>
+                                <form action="/articles/save/<%= article._id%>" method="POST" class="pull-left">
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Save</button>
+                                </form>
+                            <% } %>
+                            
+                            <button id="share-button" class="btn btn-default btn-sm btn-sm-wide" onclick="showShareLink(<%=index%>)">
                                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
                             </button>
                             <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
                                 <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                                    <button class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                                    <button class="btn btn-default btn-sm btn-sm-wide pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
                                 </form>
-                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm pull-right">
+                                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-sm btn-sm-wide pull-right">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
                                 </a>
                             <% } %>
@@ -87,16 +112,20 @@
 
 <script>
     $("#new-post-button").click(function() {
-        $("#new-post-form").toggle();
+        $("#new-post-form").show("fast", "swing");
     });
 
-    var allArticles = <%=allArticles%>;
-    console.log(allArticles);
-    if (allArticles === true) {
-        $("#feed-all").addClass("active");
-    } else {
+    var highlight = "<%=highlight%>";
+    console.log(highlight);
+
+    if (highlight == "following") {
         $("#feed-following").addClass("active");
+    } else if (highlight == "saved") {
+        $("#feed-saved").addClass("active");
+    } else if (highlight == "all") {
+        $("#feed-all").addClass("active");
     }
+
 </script>
 
 <% include ../partials/footer %>

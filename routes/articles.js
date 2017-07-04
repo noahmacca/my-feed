@@ -2,6 +2,7 @@ var moment = require("moment");
 var express = require("express");
 var router = express.Router();
 var Article = require("../models/article");
+var User = require("../models/user");
 var middleware = require("../middleware");
 var request = require('request');
 var cheerio = require("cheerio");
@@ -9,7 +10,6 @@ var cheerio = require("cheerio");
 // INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
-        allArticles = allArticles.slice(0, 40);
         if (err) {
             console.log(err);
             req.flash("error", `Error getting articles from db: ${err.message}`);
@@ -17,12 +17,13 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
         } else {
             var validArticles = [];
             for (var i=0; i < allArticles.length; i++) {
-                if(isFolloweeInArray(req.user.following, allArticles[i].author)) {
+                if(isFolloweeInArray(req.user.following, allArticles[i].author.id)) {
                     validArticles.push(allArticles[i]);
                 }
             }
+            validArticles = validArticles.slice(0, 40); // in case there's tons of matched articles
             // check each article's author against user's following list
-            return res.render("articles/index", { articles: validArticles, allArticles: false });
+            return res.render("articles/index", { articles: validArticles, highlight: "following" });
         }
     });
 });
@@ -37,7 +38,27 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         } else {
             // check each article's author against user's following list
-            return res.render("articles/index", { articles: allArticles, allArticles: true});
+            return res.render("articles/index", { articles: allArticles, highlight: "all"});
+        }
+    });
+});
+
+// INDEX - show feed of saved articles
+router.get("/saved", middleware.isLoggedIn, (req, res) => {
+    Article.find({}, (err, allArticles) => {
+        if (err) {
+            console.log(err);
+            req.flash("error", `Error getting articles from db: ${err.message}`);
+            return res.redirect("back");
+        } else {
+            var validArticles = [];
+            for (var i=0; i < allArticles.length; i++) {
+                if(isFolloweeInArray(req.user.savedArticles, allArticles[i]._id)) {
+                    validArticles.push(allArticles[i]);
+                }
+            }
+            // check each article's author against user's following list
+            return res.render("articles/index", { articles: validArticles, highlight: "saved" });
         }
     });
 });
@@ -53,8 +74,7 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
         req.flash("error", "Please specify a url for the article you'd like to post!");
         return res.redirect("back");
     }
-    var url = req.body.url.startsWith("http") ? req.body.url : "http://" + req.body.url;
-
+    var url = req.body.url; // todo: auto-add http if they don't include it, in a way that still allows request to determine if invalid uri
     var article = {
         url: url,
         desc: req.body.desc,
@@ -69,7 +89,7 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
     request(url, (err, response, body) => {
         if(err) {
             req.flash("error", err.message);
-            res.redirect("back");
+            return res.redirect("back");
         }
         var $ = cheerio.load(body);
         
@@ -89,6 +109,36 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
                 return res.redirect(`/articles/${newArticle._id}`);
             }
         })
+    });
+});
+
+// SAVE - Add article to saved list
+router.post("/save/:id", middleware.isLoggedIn, (req, res) => {
+    User.findById(req.user._id, (err, user) => {
+        Article.findById(req.params.id, (err, article) => {
+            user.savedArticles.push(article);
+            user.save();
+            req.flash("success", `Saved "${article.title}" for later`);
+            res.redirect("/articles");
+        });
+    });
+});
+
+// UNSAVE - Remove article from saved list
+router.post("/unsave/:id", middleware.isLoggedIn, (req, res) => {
+    User.findById(req.user._id, (err, user) => {
+        Article.findById(req.params.id, (err, article) => {
+            var keepSaved = [];
+            for (var i = 0; i < user.savedArticles.length; i++) {
+                if (!user.savedArticles[i]._id.equals(article._id)) {
+                    keepSaved.push(user.savedArticles[i]);
+                }
+            }
+            user.savedArticles = keepSaved;
+            user.save();
+            req.flash("success", `Removed "${article.title}" from saved list`);
+            res.redirect("/articles");
+        });
     });
 });
 
@@ -143,16 +193,16 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
             return res.redirect("/articles");
         } else {
             req.flash("success", "Post Deleted");
-            return res.redirect("back");
+            return res.redirect("/articles");
         }
     });
 });
 
 module.exports = router;
 
-function isFolloweeInArray(followingArray, followee) {
+function isFolloweeInArray(followingArray, followee_id) {
     for (var i=0; i < followingArray.length; i++) {
-        if (followingArray[i]._id.equals(followee.id)) {
+        if (followingArray[i]._id.equals(followee_id)) {
             return true
         }
     }

@@ -4,12 +4,12 @@
     <div class="row top-div">
         <div class="jumbotron">
             <% if (currentUser && article.author.id && article.author.id.equals(currentUser._id)) { %>  
-                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-md pull-right">
+                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
+                    <button class="btn btn-default btn-md btn-sm-wide pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
+                </form>
+                <a href="/articles/<%= article._id %>/edit" type="button" class="btn btn-default btn-md btn-sm-wide pull-right">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
                 </a>
-                <form class="pull-right" action="/articles/<%= article._id %>/?_method=DELETE" method="POST">
-                    <button class="btn btn-default btn-md pull-right"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
-                </form>
             <% } %>
             <h2>
                 <%= article.title %>

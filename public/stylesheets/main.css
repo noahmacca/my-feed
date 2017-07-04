@@ -23,6 +23,19 @@ p {
     border-color: #2e6da4;
 }
 
+.btn-sm-wide {
+  width: 115px;
+}
+
+.empty-feed {
+  margin: 25% auto; 
+  padding: 1.0em;
+}
+
+.btn {
+  text-transform: capitalize;
+}
+
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
     color: #fff;
     background-color: #2980b9;

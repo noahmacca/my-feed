@@ -13,6 +13,14 @@ var userSchema = new mongoose.Schema({
             },
             username: String
         }
+    ],
+    savedArticles: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Article"
+            }
+        }
     ]
 });
 
