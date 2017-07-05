@@ -5,6 +5,7 @@ var userSchema = new mongoose.Schema({
     username: String,
     password: String,
     createdAt: String,
+    tagline: String,
     followers: [
         {
             id: {

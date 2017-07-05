@@ -192,6 +192,21 @@ router.delete("/user/:id", middleware.isLoggedIn, (req, res) => {
     }
 });
 
+// Edit Tagline
+router.post("/user/:id/tagline", middleware.isLoggedIn, (req, res) => {
+    if (req.params.id == req.user.id) { // todo: refactor since this is same middleware as above
+        User.findById(req.params.id, (err, user) => {
+            user.tagline = req.body.tagline;
+            user.save();
+            req.flash("success", "Updated your tagline!");
+            return res.redirect("back");
+        });
+    } else {
+        req.flash("error", `Not authorized to edit someone else's tagline!`);
+        return res.redirect("back");
+    }
+});
+
 module.exports = router;
 
 // Local functions

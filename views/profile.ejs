@@ -35,16 +35,49 @@
                 <h1>
                     <%= user.username %>
                 </h1>
-                <h4 style="font-weight: 400;">[personal tagline here]</h4>
+                <h4 style="font-weight: 400;">
+                    <% if ((currentUser) && (user.id == currentUser.id)) { %>
+                        <button id="tagline-edit" class="btn btn-sm btn-primary">Edit</button>
+                    <% } %>
+                    <% if (!user.tagline) { %>
+                        <span>[personal tagline here]</span>
+                    <% } else { %>
+                        <%= user.tagline %>
+                    <% } %>
+                </h4>
+                <form id="tagline-form" class="form-inline" action="/user/<%= user.id %>/tagline" method="POST" style="display: none;">
+                    <input type="text" class="form-control" name="tagline" placeholder="New Tagline" style="width: 50%;">
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-3">
-            <h4>Joined: <span style="display: none;" id="moment"><%= user.createdAt %></span></h4>
+            <h4>Joined: <span style="display: none;" id="moment-day"><%= user.createdAt %></span></h4>
             <h4><%= articles.length %> posts</h4>
-            <h4><%= user.following.length - 1 %> following</h4>
-            <h4><%= user.followers.length %> follwers</h4>
+            <h4 id="following-expand"><%= user.following.length - 1 %> following</h4>
+            <ul id="following-list" style="display: none;" class="list-group">
+                <% if (user.following && user.following.length > 1) { %>
+                    <% user.following.forEach(function(followee){ %>
+                        <% if (followee.username !== user.username) { %>
+                            <li class="list-group-item"><%= followee.username %></li>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <li class="list-group-item">Not following anyone yet</li>
+                <% } %>
+            </ul>
+            <h4 id="follower-expand"><%= user.followers.length %> follwers</h4>
+            <ul id="follower-list" style="display: none;" class="list-group">
+                <% if (user.followers) { %>
+                    <% user.followers.forEach(function(follower){ %>
+                        <li class="list-group-item"><%= follower.username %></li>
+                    <% }); %>
+                <% } else { %>
+                    <li class="list-group-item">Not followed by anyone yet</li>
+                <% } %>
+            </ul>
             <% if ((currentUser) && (user.id == currentUser.id)) { %>
                 <form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">
                     <button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>
@@ -108,12 +141,31 @@
 
 <script src="/js/moment.js"></script>
 <script>
+    $("#following-expand").click(function() {
+        $("#following-list").show("fast", "linear");
+    });
+
+    $("#follower-expand").click(function() {
+        $("#follower-list").show("fast", "linear");
+    });
+
+    $("#tagline-edit").click(function() {
+        $("#tagline-form").show("fast", "linear");
+    });
+
+
+
     function deleteConfirm() {
         return confirm('Are you sure? Your posts will still be visible; delete them first if you want them gone as well.')
     }
 
     $("[id=moment]").each(function(obj) {
         this.innerHTML = moment(this.innerHTML).local().format("MMMM D, h:mm a");
+        this.style.display = "inline";
+    });
+
+    $("[id=moment-day]").each(function(obj) {
+        this.innerHTML = moment(this.innerHTML).local().format("MMMM D");
         this.style.display = "inline";
     });
 </script>
