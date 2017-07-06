@@ -61,28 +61,29 @@
                 <% if (user.following && user.following.length > 1) { %>
                     <% user.following.forEach(function(followee){ %>
                         <% if (followee.username !== user.username) { %>
-                            <li class="list-group-item"><%= followee.username %></li>
+                            <li class="list-group-item"><a href="/user/<%=followee._id%>"><%= followee.username %></a></li>
                         <% } %>
                     <% }); %>
                 <% } else { %>
-                    <li class="list-group-item">Not following anyone yet</li>
+                    <li class="list-group-item">Not following anyone</li>
                 <% } %>
             </ul>
             <h4 id="follower-expand"><%= user.followers.length %> follwers</h4>
             <ul id="follower-list" style="display: none;" class="list-group">
-                <% if (user.followers) { %>
+                <% if (user.followers && user.followers.length >= 1) { %>
                     <% user.followers.forEach(function(follower){ %>
-                        <li class="list-group-item"><%= follower.username %></li>
+                        <li class="list-group-item"><a href="/user/<%=follower._id%>"><%= follower.username %></a></li>
                     <% }); %>
                 <% } else { %>
-                    <li class="list-group-item">Not followed by anyone yet</li>
+                    <li class="list-group-item">No followers</li>
                 <% } %>
             </ul>
-            <% if ((currentUser) && (user.id == currentUser.id)) { %>
-                <form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">
-                    <button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>
-                </form>
-            <% } %>
+            <!-- Remove Delete Account functionality for now - restore when implement user settings page -->
+            <!--<% if ((currentUser) && (user.id == currentUser.id)) { %> -->
+                <!--<form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">-->
+                    <!--<button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>-->
+                <!--</form>-->
+            <!--<% } %>-->
         </div>
         <div class="col-md-9">
             <div>
