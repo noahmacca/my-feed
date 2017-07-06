@@ -1,32 +1,54 @@
 
     
-
-    <!-- Help Modal -->
-    <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">What to do</h4>
-                </div>
-                <div class="modal-body">
-                    <ol class="getting-started-list">
-                        <li>Post an article! It'll show up in your feed and your <a href="/user/<%=currentUser._id%>">public profile</a>.</li>
-                        <li>Check out the <a href="/articles/all">All Users</a> feed to see what others are posting, and comment on anything you find interesting</li>
-                        <li>Follow other users to see their posts</li>
-                        <li>Link your friends straight to discussions with the share button</li>
-                        <li>Check your feed daily to see what others have added</li>
-                    </ol>
-                    <p style="margin-top: 10%;">P.S. I'm thrilled that you've signed up. 150 magical elves and I have been working around the clock to make article sharing better, and we all hope you enjoy your time here. If you have <strong>any</strong> thoughts or concerns, shoot us an email at <a href="mailto:info@myfeed.cool">info@myfeed.cool</a>. You'll definitely get cool points.</p>
-                    <h5 class="text-right">-Noah</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <% if (currentUser) { %>
+        <!-- Help Modal -->
+        <div id="infoModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">What to do</h4>
+                    </div>
+                    <div class="modal-body">
+                        <ol class="getting-started-list">
+                            <li>Post an article! It'll show up in your feed and your <a href="/user/<%=currentUser._id%>">public profile</a>.</li>
+                            <li>Check out the <a href="/articles/all">All Users</a> feed to see what others are posting, and comment on anything you find interesting</li>
+                            <li>Follow other users to see their posts</li>
+                            <li>Link your friends straight to discussions with the share button</li>
+                            <li>Check your feed daily to see what others have added</li>
+                        </ol>
+                        <p style="margin-top: 10%;">P.S. I'm thrilled that you've signed up. 150 magical elves and I have been working around the clock to make article sharing better, and we all hope you enjoy your time here. If you have <strong>any</strong> thoughts or concerns, shoot us an email at <a href="mailto:info@myfeed.cool">info@myfeed.cool</a>. You'll definitely get cool points.</p>
+                        <h5 class="text-right">-Noah</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    <% } else { %>
+        <div id="infoModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">What to do</h4>
+                    </div>
+                    <div class="modal-body">
+                        <ol class="getting-started-list">
+                            <li>Sign up!</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+    
 
     <!-- Footer -->
     <footer>
@@ -36,7 +58,7 @@
                 Made with <3 in Seattle, WA. Code available on <a href="https://github.com/noahmacca/my-feed">Github</a>. Questions, comments or feedback? Please don't hesitate to contact us at <a href="mailto:info@myfeed.cool">info@myfeed.cool</a>. &copy;MyFeed 2017.
             </p>
             <div class="text-right">
-                <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#myModal">Need Help?</button>
+                <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#infoModal">Need Help?</button>
             </div>
         </div>
     </footer>

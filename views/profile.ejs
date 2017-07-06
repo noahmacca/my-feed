@@ -56,28 +56,30 @@
         <div class="col-md-3">
             <h4>Joined: <span style="display: none;" id="moment-day"><%= user.createdAt %></span></h4>
             <h4><%= articles.length %> post<%= articles.length !== 1 ? "s" : "" %></h4>
-            <h4 id="following-expand"><strong><%= user.following.length - 1 %> following</strong></h4>
-            <ul id="following-list" style="display: none;" class="list-group">
-                <% if (user.following && user.following.length > 1) { %>
-                    <% user.following.forEach(function(followee){ %>
-                        <% if (followee.username !== user.username) { %>
-                            <li class="list-group-item"><a href="/user/<%=followee._id%>"><%= followee.username %></a></li>
-                        <% } %>
-                    <% }); %>
-                <% } else { %>
-                    <li class="list-group-item">Not following anyone</li>
-                <% } %>
-            </ul>
-            <h4 id="follower-expand"><strong><%= user.followers.length %> follwers</strong></h4>
-            <ul id="follower-list" style="display: none;" class="list-group">
-                <% if (user.followers && user.followers.length >= 1) { %>
-                    <% user.followers.forEach(function(follower){ %>
-                        <li class="list-group-item"><a href="/user/<%=follower._id%>"><%= follower.username %></a></li>
-                    <% }); %>
-                <% } else { %>
-                    <li class="list-group-item">No followers</li>
-                <% } %>
-            </ul>
+            
+                <button class="btn btn-md btn-follow" id="following-expand"><strong><%= user.following.length - 1 %> following</strong></button>
+                <ul id="following-list" style="display: none;" class="list-group">
+                    <% if (user.following && user.following.length > 1) { %>
+                        <% user.following.forEach(function(followee){ %>
+                            <% if (followee.username !== user.username) { %>
+                                <li class="list-group-item"><a href="/user/<%=followee._id%>"><%= followee.username %></a></li>
+                            <% } %>
+                        <% }); %>
+                    <% } else { %>
+                        <li class="list-group-item">Not following anyone</li>
+                    <% } %>
+                </ul>
+                <button class="btn btn-md btn-follow" id="follower-expand"><strong><%= user.followers.length %> follwers</strong></button>
+                <ul id="follower-list" style="display: none;" class="list-group">
+                    <% if (user.followers && user.followers.length >= 1) { %>
+                        <% user.followers.forEach(function(follower){ %>
+                            <li class="list-group-item"><a href="/user/<%=follower._id%>"><%= follower.username %></a></li>
+                        <% }); %>
+                    <% } else { %>
+                        <li class="list-group-item">No followers</li>
+                    <% } %>
+                </ul>
+            
             <!-- Remove Delete Account functionality for now - restore when implement user settings page -->
             <!--<% if ((currentUser) && (user.id == currentUser.id)) { %> -->
                 <!--<form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">-->
@@ -143,15 +145,15 @@
 <script src="/js/moment.js"></script>
 <script>
     $("#following-expand").click(function() {
-        $("#following-list").show("fast", "linear");
+        $("#following-list").toggle("fast", "linear");
     });
 
     $("#follower-expand").click(function() {
-        $("#follower-list").show("fast", "linear");
+        $("#follower-list").toggle("fast", "linear");
     });
 
     $("#tagline-edit").click(function() {
-        $("#tagline-form").show("fast", "linear");
+        $("#tagline-form").toggle("fast", "linear");
     });
 
 

@@ -49,6 +49,15 @@ footer {
   text-transform: capitalize;
 }
 
+.btn:focus {
+  outline: none;
+}
+
+.btn-follow {
+  width: 150px;
+  margin-top: 10px;
+}
+
 
 #seattle {
   display: table;
