@@ -38,7 +38,7 @@
                         <input id="url-input" class="form-control" type="text" name="url" placeholder="Url (include 'http')">
                     </div>
                     <div class="form-group">
-                        <input class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
+                        <input id="comment-input" class="form-control" rows="10" type="text" name="desc" placeholder="Your Comments">
                     </div>
                     <div class="form-group">
                         <button class="btn btn-lg btn-primary btn-block">Submit</button>
@@ -49,11 +49,18 @@
                    <% if (highlight == "saved") { %>
                         <h4 class="text-center empty-feed">Go save some articles!</h4>
                    <% } else { %>
-                        <div class="text-center empty-feed">
-                            <h4 onclick="expandForm()">Post an article to populate your feed!</h4>
-                            <p>(e.g. https://techcrunch.com/2017/06/04/when-you-look-into-the-news-feed-the-news-feed-looks-into-you/)</p>
+                        <div class="empty-feed well" style="padding: 4%;">
+                            <h1>Getting Started</h1>
+                            <ol class="getting-started-list">
+                                <h4><li>Post an article using the form above! It'll show up in your feed and your <a href="/user/<%=currentUser._id%>">public profile</a>.</li></h4>
+                                <h4><li>Check out the <a href="/articles/all">All Users</a> feed to see what others are posting, and comment on anything you find interesting</li></h4>
+                                <h4><li>Follow other users to see their posts</li></h4>
+                                <h4><li>Link your friends straight to discussions with the share button</li></h4>
+                                <h4><li>Check your feed daily to see what others have added</li></h4>
+                            </ol>
+                            <h5 style="margin-top: 10%;">P.S. I'm thrilled that you've signed up. 150 magical elves and I have been working around the clock to make article sharing better, and we all hope you enjoy your time here. If you have <strong>any</strong> thoughts or concerns, shoot us an email at <a href="mailto:info@myfeed.cool">info@myfeed.cool</a>. You'll definitely get cool points.</h5>
+                            <h5 class="text-right">-Noah</h5>
                         </div>
-                        <!--<a href="/articles/new" class="btn btn-block btn-lg btn-primary empty-feed">Post an article to populate your feed!</a>-->
                    <% } %>
             <% } else { %>
                 <div>
@@ -130,6 +137,12 @@
     $("#new-post-button").click(expandForm);
 
     var highlight = "<%=highlight%>";
+    if ((<%= articles.length %> == 0) && (highlight == "following")) { 
+        $("#new-post-form").show("slow", "swing");
+        $('#url-input').val($('#url-input').val() + "http://business.financialpost.com/feature/the-cryptocurrency-prophet/wcm/faf71b6d-df9b-42dd-9ede-ba35725957c5");
+        $("#url-input").focus();
+        $('#comment-input').val($('#comment-input').val() + "I was feeling lazy when I signed up so I decided to leave the sample text as-is. MyFeed rocks!");
+     }
 
     if (highlight == "following") {
         $("#feed-following").addClass("active");
