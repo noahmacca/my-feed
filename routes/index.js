@@ -5,6 +5,7 @@ var User = require("../models/user");
 var Article = require("../models/article");
 var moment = require("moment");
 var middleware = require("../middleware");
+var facebook = require('../utils/facebook');
 var mongoose = require("mongoose");
 
 // Landing page
@@ -40,7 +41,7 @@ router.post("/login", passport.authenticate('local-login', {
 }));
 
 // facebook login routes
-router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email'}));
+router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'user_friends' }));
 
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {
     successRedirect: '/articles',
@@ -58,7 +59,7 @@ router.get("/logout", (req, res) => {
 // unauthed for easy sharing
 router.get("/user/:id", (req, res) => {
     // get user's profile information
-    User.findById({ _id: req.params.id}, (err, user) => {
+    User.findById(req.params.id, (err, user) => {
         if (err) {
             req.flash("error", `Error fetching user: ${err.message}`);
             return res.redirect("back");
@@ -74,18 +75,22 @@ router.get("/user/:id", (req, res) => {
                     res.redirect("back");
                 } else {
                     var articles = []
-                    counter = 0;
                     // filter out articles that don't belong to this user
-                    allArticles.forEach((article) => { // todo: make this more efficient. Won't scale
+                    for (var i = 0; i < articles.length; i++) {
                         if (user && article.author.id.equals(user.id)) {
-                            articles.push(article);
+                            articles.push(allArticles[i]);
                         }
-                        counter++;
-                        if (counter == allArticles.length) {
-                            var isFollowing = req.user ? isAlreadyFollowing(req.user.following, user) : false
-                            return res.render("profile", { user: user, articles: articles, isFollowing: isFollowing });
-                        }
-                    });
+                    }
+                    var isFollowing = req.user ? isAlreadyFollowing(req.user.following, user) : false
+                    // Get user's facebook friends if facebook if user logged in, they're a fb user and they are looking at their own profile
+                    if (req.user && user.facebook.id && user._id.equals(req.user._id)) {
+                        facebook.getFriendsList(req.user.facebook.token, '/me/friends', (friends) => {
+                            friends = JSON.parse(friends).data;
+                            return res.render("profile", { user: user, articles: articles, isFollowing: isFollowing, friends: friends });
+                        });
+                    } else {
+                        return res.render("profile", { user: user, articles: articles, isFollowing: isFollowing, friends: false });
+                    }
                 }
             });
         }

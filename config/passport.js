@@ -1,3 +1,4 @@
+var moment = require('moment');
 var LocalStrategy = require("passport-local").Strategy;
 var FacebookStrategy = require("passport-facebook").Strategy;
 var User = require("../models/user");
@@ -24,7 +25,7 @@ module.exports = function(passport) {
     /////////////////////
     // LOCAL AUTH
     /////////////////////
-    // SIGNUP
+    // SIGNUP/SIGN-IN
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'username',
         passwordField: 'password',
@@ -42,10 +43,14 @@ module.exports = function(passport) {
                         // make a new user
                         var newUser = new User();
                         newUser.local.username = username;
+                        newUser.username = username;
                         newUser.local.password = newUser.generateHash(password);
+                        newUser.following.push(newUser);
+                        newUser.createdAt = moment().format();
                         newUser.save((err) => {
                             if(err)
                                 throw err;
+                            req.flash("success", "Welcome!")
                             return done(null, newUser);
                         });
                     }
@@ -69,6 +74,7 @@ module.exports = function(passport) {
             if (!user.validPassword(password))
                 return done(null, false, req.flash('error', "Sorry, that's the wrong password."));
             // no issues, return user
+            req.flash("success", "Welcome back!")
             return done(null, user);
         });
     }));
@@ -80,7 +86,7 @@ module.exports = function(passport) {
         clientID: fbClientId,
         clientSecret: fbClientSecret,
         callbackURL: fbCallbackUrl,
-        profileFields: ['id', 'email', 'first_name', 'last_name'],
+        profileFields: ['id', 'email', 'first_name', 'last_name', 'friends'],
     },
     (token, refreshToken, profile, done) => {
         process.nextTick(function() {
@@ -89,6 +95,7 @@ module.exports = function(passport) {
                     return done(err);
                 if (user) {
                     // user has already registered, log them in
+                    // req.flash("success", "Welcome back!")
                     return done(null, user);
                 } else {
                     // create new user
@@ -96,11 +103,15 @@ module.exports = function(passport) {
                     newUser.facebook.id = profile.id;
                     newUser.facebook.token = token;
                     newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
-                    newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
+                    newUser.username = newUser.facebook.name
+                    newUser.facebook.email = (profile.emails ? profile.emails[0].value : '').toLowerCase();
+                    newUser.following.push(newUser);
+                    newUser.createdAt = moment().format();
 
                     newUser.save(function(err) {
                         if(err)
                             throw err;
+                        // req.flash("success", "Welcome!")
                         return done(null, newUser);
                     });
                 }

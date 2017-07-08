@@ -57,32 +57,49 @@
             <h4>Joined: <span style="display: none;" id="moment-day"><%= user.createdAt %></span></h4>
             <h4><%= articles.length %> post<%= articles.length !== 1 ? "s" : "" %></h4>
             
-                <button class="btn btn-md btn-follow" id="following-expand"><strong><%= user.following.length - 1 %> following</strong></button>
-                <ul id="following-list" style="display: none;" class="list-group">
-                    <% if (user.following && user.following.length > 1) { %>
-                        <% user.following.forEach(function(followee){ %>
-                            <% if (followee.username !== user.username) { %>
-                                <li class="list-group-item"><a href="/user/<%=followee._id%>"><%= followee.username %></a></li>
-                            <% } %>
-                        <% }); %>
-                    <% } else { %>
-                        <li class="list-group-item">Not following anyone</li>
-                    <% } %>
-                </ul>
-                <button class="btn btn-md btn-follow" id="follower-expand"><strong><%= user.followers.length %> follwers</strong></button>
-                <ul id="follower-list" style="display: none;" class="list-group">
-                    <% if (user.followers && user.followers.length >= 1) { %>
-                        <% user.followers.forEach(function(follower){ %>
-                            <li class="list-group-item"><a href="/user/<%=follower._id%>"><%= follower.username %></a></li>
-                        <% }); %>
-                    <% } else { %>
-                        <li class="list-group-item">No followers</li>
-                    <% } %>
-                </ul>
+            <button class="btn btn-md btn-follow" id="following-expand"><strong><%= user.following.length - 1 %> following</strong></button>
+            <ul id="following-list" style="display: none;" class="list-group">
+                <% if (user.following && user.following.length > 1) { %>
+                    <% user.following.forEach(function(followee){ %>
+                        <% if (followee.username !== user.username) { %>
+                            <li class="list-group-item"><a href="/user/<%=followee._id%>"><%= followee.username %></a></li>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <li class="list-group-item">Not following anyone</li>
+                <% } %>
+            </ul>
+            <button class="btn btn-md btn-follow" id="follower-expand"><strong><%= user.followers.length %> follwers</strong></button>
+            <ul id="follower-list" style="display: none;" class="list-group">
+                <% if (user.followers && user.followers.length >= 1) { %>
+                    <% user.followers.forEach(function(follower){ %>
+                        <li class="list-group-item"><a href="/user/<%=follower._id%>"><%= follower.username %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li class="list-group-item">No followers</li>
+                <% } %>
+            </ul>
+
+            <!-- Show a list of your fb friends if it's your profile -->
+            <% if ((currentUser) && (user.id == currentUser.id)) { %>
+                <% if (friends && friends.length > 0) { %>
+                    <ul>
+                        <% friends.forEach(function(friend) { %>
+                            <li>
+                                Name: <%= friend.name %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } else if (friends) { %>
+                    <p>Go tell your facebook friends to join!</p>
+                <% } else { %>
+                    <p>Use facebook login to see your friends that use MyFeed!</p>
+                <% }%>
+            <% } %>
             
             <!-- Remove Delete Account functionality for now - restore when implement user settings page -->
             <!--<% if ((currentUser) && (user.id == currentUser.id)) { %> -->
-                <!--<form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 100px;" method="POST">-->
+                <!--<form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 1<0>0px;" method="POST">-->
                     <!--<button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>-->
                 <!--</form>-->
             <!--<% } %>-->

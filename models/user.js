@@ -12,8 +12,8 @@ var userSchema = new mongoose.Schema({
         token: String,
         email: String,
         name: String,
-        username: String,
     },
+    username: String,
     createdAt: String,
     tagline: String,
     followers: [

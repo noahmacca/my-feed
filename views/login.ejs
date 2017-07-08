@@ -3,15 +3,21 @@
 <div class="container">
     <div class="row">
         <h1 style="text-align: center">Login</h1>
-        <div style="width: 30%; margin: 25px auto;">
+        <div style="width: 300px; margin: 25px auto;">
             <form action="/login" method="POST">
                 <input id="focus" class="form-group form-control" type="text" name="username" placeholder="username">
                 <input class="form-group form-control" type="password" name="password", placeholder="password">
-                <button class="btn btn-lg btn-primary btn-block">Login</button>
+                <button class="btn btn-lg btn-primary btn-block">Continue</button>
             </form>
-            <a href="/auth/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
-            <div class="text-center" style="padding-top: 1.0em;">
-                <a href="/register">No Account? Sign up!</a>
+            <div class="text-center">
+                <div>
+                    <h4>OR</h4>
+                </div>
+                <div>
+                    <a href="/auth/facebook">
+                        <button class="loginBtn loginBtn--facebook">Continue with Facebook</button>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
