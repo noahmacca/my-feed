@@ -58,6 +58,7 @@ router.get("/logout", (req, res) => {
 // User's Profile Page
 // unauthed for easy sharing
 router.get("/user/:id", (req, res) => {
+    // todo: this is becoming a mess, refactor
     // get user's profile information
     User.findById(req.params.id, (err, user) => {
         if (err) {
@@ -98,7 +99,7 @@ router.get("/user/:id", (req, res) => {
 });
 
 // Follow user
-router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
+router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
     // Add the user to your following list, and andd you to the user's follower list
     // load the person's follow list
     User.findById(req.user._id, (err, user) => {
@@ -107,7 +108,8 @@ router.post("/user/follow/:id", middleware.isLoggedIn, (req, res) => {
             res.redirect("back");
         } else {
             // Look up the followee add them to the list
-            User.findById(req.params.id, (err, followee) => {
+            findUser(req.params.id, req.params.type, (err, followee) => {
+            // User.findById(req.params.id, (err, followee) => {
                 if (followee._id.equals(user._id)) {
                     req.flash("error", "You can't follow yourself!");
                     return res.redirect(`/user/${followee._id}`);    
@@ -211,4 +213,21 @@ function isAlreadyFollowing(followingArray, followee) {
         }
     }
     return false
+}
+
+// look up user by facebook or local id
+function findUser(id, type, next) {
+    if (type && type == "fb") {
+        User.findOne({ 'facebook.id': id }, (err, user) => {
+            if(err)
+                return next(err);
+            return next(null, user);
+        });
+    } else {
+        User.findById(id, (err, user) => {
+            if(err)
+                return next(err);
+            return next(null, user);
+        });
+    }
 }

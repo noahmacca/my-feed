@@ -22,7 +22,7 @@
                                 <button class="btn btn-default btn-lg"></span>Login to follow this user</button>
                             </form>
                         <% } else if ((user.username !== currentUser.username) && (!isFollowing)) { %>
-                            <form action="/user/follow/<%= user._id %>/" method="POST">
+                            <form action="/user/follow/<%= user._id %>/default" method="POST">
                                 <button class="btn btn-default btn-lg btn-wide"></span>Follow</button>
                             </form>
                         <% } else if ((user.username !== currentUser.username) && (isFollowing)) { %>
@@ -82,19 +82,23 @@
 
             <!-- Show a list of your fb friends if it's your profile -->
             <% if ((currentUser) && (user.id == currentUser.id)) { %>
-                <% if (friends && friends.length > 0) { %>
-                    <ul>
+            <button class="btn btn-md btn-follow"><strong>Suggested</strong></button>
+                <ul id="follower-list" class="list-group">
+                    <% if (friends && friends.length > 0) { %>
                         <% friends.forEach(function(friend) { %>
-                            <li>
-                                Name: <%= friend.name %>
+                            <li class="list-group-item">
+                                <div><%= friend.name %></div>
+                                <form class="form-horizontal" action="/user/follow/<%= friend.id %>/fb" method="POST">
+                                    <button class='btn btn-sm btn-default'>Follow</button>
+                                </form>
                             </li>
                         <% }) %>
-                    </ul>
-                <% } else if (friends) { %>
-                    <p>Go tell your facebook friends to join!</p>
-                <% } else { %>
-                    <p>Use facebook login to see your friends that use MyFeed!</p>
-                <% }%>
+                    <% } else if (friends) { %>
+                         <li class="list-group-item">Go tell your facebook friends to join!</li>
+                    <% } else { %>
+                         <li class="list-group-item">Use facebook login to see your friends that use MyFeed</li>
+                    <% }%>
+                </ul>
             <% } %>
             
             <!-- Remove Delete Account functionality for now - restore when implement user settings page -->
