@@ -39,6 +39,14 @@ router.post("/login", passport.authenticate('local-login', {
     failureFlash: true
 }));
 
+// facebook login routes
+router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email'}));
+
+router.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    successRedirect: '/articles',
+    failureRedirect: '/',
+}));
+
 // logout route
 router.get("/logout", (req, res) => {
     req.logout();

@@ -3,9 +3,9 @@ var FacebookStrategy = require("passport-facebook").Strategy;
 var User = require("../models/user");
 
 // get the auth vars
-// var fbClientId = process.env.FBCLIENTID;
-// var fbClientSecret = process.env.FBCLIENTSECRET;
-// var fbCallbackUrl = process.env.FBCALLBACKURL;
+var fbClientId = process.env.FBCLIENTID;
+var fbClientSecret = process.env.FBCLIENTSECRET;
+var fbCallbackUrl = process.env.FBCALLBACKURL;
 
 module.exports = function(passport) {
 
@@ -21,7 +21,10 @@ module.exports = function(passport) {
         });
     });
     
-    // local strategy for signup
+    /////////////////////
+    // LOCAL AUTH
+    /////////////////////
+    // SIGNUP
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'username',
         passwordField: 'password',
@@ -51,7 +54,7 @@ module.exports = function(passport) {
         })
     );
 
-    // local strategy for logging in
+    // LOGIN
     passport.use('local-login', new LocalStrategy({
         usernameField: 'username',
         passwordField: 'password',
@@ -70,47 +73,38 @@ module.exports = function(passport) {
         });
     }));
 
-    // // FACEBOOK STRATEGY
-    // passport.use(new FacebookStrategy({
-    //     clientID: fbClientId,
-    //     clientSecret = fbClientSecret,
-    //     callbackURL: fbCallbackUrl
-    // },
-    
-    // // facebook will send back the token and profile
-    // (token, refreshToken, profile, done) => {
-        
-    //     process.nextTick(() => {
+    /////////////////////
+    // FACEBOOK AUTH
+    /////////////////////
+    passport.use(new FacebookStrategy({
+        clientID: fbClientId,
+        clientSecret: fbClientSecret,
+        callbackURL: fbCallbackUrl,
+        profileFields: ['id', 'email', 'first_name', 'last_name'],
+    },
+    (token, refreshToken, profile, done) => {
+        process.nextTick(function() {
+            User.findOne({ 'facebook.id': profile.id }, (err, user) => {
+                if(err)
+                    return done(err);
+                if (user) {
+                    // user has already registered, log them in
+                    return done(null, user);
+                } else {
+                    // create new user
+                    var newUser = new User();
+                    newUser.facebook.id = profile.id;
+                    newUser.facebook.token = token;
+                    newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
+                    newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
 
-    //         // get user from db with fb id
-    //         User.findOne({ 'facebook.id': profile.id }, (err, user) => {
-
-    //             // possible error connecting to db
-    //             if(err) {
-    //                 return done(err);
-    //             }
-
-    //             // Log in found user
-    //             if (user) {
-    //                 return done(null, user);
-    //             } else {
-    //                 // if no user found, create them
-    //                 var newUser = new User();
-
-    //                 newUser.facebook.id = profile.id;
-    //                 newUser.facebook.token = token;
-    //                 newUser.facebook.name = profile.name.givenName + '' + profile.name.familyName;
-    //                 newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails, take the first
-
-    //                 // save our user to the db
-    //                 newUser.save((err) => {
-    //                     if(err) {
-    //                         throw err;
-    //                     }
-    //                     return done(null, newUser);
-    //                 });
-    //             }
-    //         });
-    //     });
-    // }));
+                    newUser.save(function(err) {
+                        if(err)
+                            throw err;
+                        return done(null, newUser);
+                    });
+                }
+            });
+        });
+    }));
 }
