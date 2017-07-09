@@ -34,35 +34,8 @@ router.get("/login", (req, res) => {
 });
 
 // Login logic
-router.post("/login", (req, res, next) => {
-    User.findOne({ 'username': req.body.username }, (err, foundUser) => {
-        if (err) {
-            req.flash('error', err.message);
-            return res.redirect('/login');
-        }
-        if (!foundUser) {
-            req.flash('error', 'User not found.');
-            return res.redirect('/login');
-        }
-        passport.authenticate('local', (err, user, info) => {
-            if(err) {
-                req.flash("error", err.message); // todo: should probably throw here
-                return res.redirect("/login");
-            }
-            if(!user) {
-                req.flash("error", "Sorry, that's the wrong password.");
-                return res.redirect("/login");
-            }
-            req.login(user, (err) => {
-                if(err) {
-                    flash("error", err);
-                    return res.redirect("/login");
-                }
-                req.flash("success", `Welcome back ${req.user.username}`);
-                return res.redirect('/articles');
-            });
-        })(req, res, next);
-    });
+router.post('/login', (req, res, next) => {
+    passport.loginUser(req, res, next);
 });
 
 // facebook login routes

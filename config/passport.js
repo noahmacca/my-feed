@@ -9,7 +9,7 @@ var fbClientSecret = process.env.FBCLIENTSECRET;
 var fbCallbackUrl = process.env.FBCALLBACKURL;
 
 module.exports = function (passport) {
-    
+
     passport.serializeUser(User.serializeUser());
     passport.deserializeUser(User.deserializeUser());
 
@@ -17,7 +17,7 @@ module.exports = function (passport) {
     // LOCAL AUTH
     /////////////////////
 
-    // SIGNUP/SIGN-IN
+    // SIGNUP
     passport.use('local-signup', new LocalStrategy({
         usernameField: 'username',
         passwordField: 'password',
@@ -53,6 +53,38 @@ module.exports = function (passport) {
             });
         })
     );
+
+    // SIGN-IN - a bit hacky but needed to get passport.authenticate to behave properly
+    passport.loginUser = function(req, res, next) {
+        User.findOne({ 'username': req.body.username }, (err, foundUser) => {
+            if (err) {
+                req.flash('error', err.message);
+                return res.redirect('/login');
+            }
+            if (!foundUser) {
+                req.flash('error', 'User not found.');
+                return res.redirect('/login');
+            }
+            passport.authenticate('local', (err, user, info) => {
+                if (err) {
+                    req.flash("error", err.message); // todo: should probably throw here
+                    return res.redirect("/login");
+                }
+                if (!user) {
+                    req.flash("error", "Sorry, that's the wrong password.");
+                    return res.redirect("/login");
+                }
+                req.login(user, (err) => {
+                    if (err) {
+                        flash("error", err);
+                        return res.redirect("/login");
+                    }
+                    req.flash("success", `Welcome back ${req.user.username}`);
+                    return res.redirect('/articles');
+                });
+            })(req, res, next);
+        });
+    }
 
     /////////////////////
     // FACEBOOK AUTH
