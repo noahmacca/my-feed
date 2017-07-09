@@ -34,11 +34,36 @@ router.get("/login", (req, res) => {
 });
 
 // Login logic
-router.post("/login", passport.authenticate('local-login', {
-    successRedirect: '/articles',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
+router.post("/login", (req, res, next) => {
+    User.findOne({ 'username': req.body.username }, (err, foundUser) => {
+        if (err) {
+            req.flash('error', err.message);
+            return res.redirect('/login');
+        }
+        if (!foundUser) {
+            req.flash('error', 'User not found.');
+            return res.redirect('/login');
+        }
+        passport.authenticate('local', (err, user, info) => {
+            if(err) {
+                req.flash("error", err.message); // todo: should probably throw here
+                return res.redirect("/login");
+            }
+            if(!user) {
+                req.flash("error", "Sorry, that's the wrong password.");
+                return res.redirect("/login");
+            }
+            req.login(user, (err) => {
+                if(err) {
+                    flash("error", err);
+                    return res.redirect("/login");
+                }
+                req.flash("success", `Welcome back ${req.user.username}`);
+                return res.redirect('/articles');
+            });
+        })(req, res, next);
+    });
+});
 
 // facebook login routes
 router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'user_friends' }));
@@ -103,28 +128,28 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
     // Add the user to your following list, and andd you to the user's follower list
     // load the person's follow list
     User.findById(req.user._id, (err, user) => {
-        if(err) {
+        if (err) {
             req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
             // Look up the followee add them to the list
             findUser(req.params.id, req.params.type, (err, followee) => {
-            // User.findById(req.params.id, (err, followee) => {
+                // User.findById(req.params.id, (err, followee) => {
                 if (followee._id.equals(user._id)) {
                     req.flash("error", "You can't follow yourself!");
-                    return res.redirect(`/user/${followee._id}`);    
+                    return res.redirect(`/user/${followee._id}`);
                 } else if (isAlreadyFollowing(user.following, followee)) {
                     req.flash("error", "You're already following this person!");
-                    return res.redirect(`/user/${followee._id}`);    
+                    return res.redirect(`/user/${followee._id}`);
                 } else {
                     // 1. Add the user to your following list
                     user.following.push(followee);
                     user.save();
-                    
+
                     // 2. Add you to the user's follower list
                     followee.followers.push(user);
                     followee.save();
-                    
+
                     req.flash("success", `Successfully followed ${followee.username}`);
                     return res.redirect(`/user/${followee._id}`);
                 }
@@ -137,19 +162,19 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
 router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
     // load the user's information
     User.findById(req.user._id, (err, user) => {
-        if(err) {
+        if (err) {
             req.flash("error", `Error fetching user: ${err.message}`);
             res.redirect("back");
         } else {
             User.findById(req.params.id, (err, followee) => {
-                if(err) {
+                if (err) {
                     req.flash("error", `Error fetching user: ${err.message}`);
                     return res.redirect("back");
                 }
                 // 1. Remove from user's following list
                 user.following = removeFromArray(user.following, mongoose.Types.ObjectId(req.params.id));
                 user.save()
-                
+
                 // 2. Remove from followees follower list
                 followee.followers = removeFromArray(followee.followers, user._id);
                 followee.save()
@@ -165,10 +190,10 @@ router.post("/user/unfollow/:id", middleware.isLoggedIn, (req, res) => {
 router.delete("/user/:id", middleware.isLoggedIn, (req, res) => {
     if (req.params.id == req.user.id) {
         User.remove({ _id: req.params.id }, (err) => {
-            if(err) {
+            if (err) {
                 req.flash("error", `error deleting account: ${err.message}`)
                 return res.redirect("back");
-            } 
+            }
             req.flash("success", "Account deleted. Hope to see you again someday!")
             return res.redirect("/");
         });
@@ -207,7 +232,7 @@ function removeFromArray(mongoArray, mongoId) {
 }
 
 function isAlreadyFollowing(followingArray, followee) {
-    for (var i=0; i < followingArray.length; i++) {
+    for (var i = 0; i < followingArray.length; i++) {
         if (followingArray[i]._id.equals(followee._id)) {
             return true
         }
@@ -219,13 +244,13 @@ function isAlreadyFollowing(followingArray, followee) {
 function findUser(id, type, next) {
     if (type && type == "fb") {
         User.findOne({ 'facebook.id': id }, (err, user) => {
-            if(err)
+            if (err)
                 return next(err);
             return next(null, user);
         });
     } else {
         User.findById(id, (err, user) => {
-            if(err)
+            if (err)
                 return next(err);
             return next(null, user);
         });
