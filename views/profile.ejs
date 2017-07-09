@@ -9,6 +9,15 @@
         }
         return false
     }
+
+    function isUsernameInMongoArray(mongoArray, username) {
+        for (var i=0; i < mongoArray.length; i++) {
+            if (mongoArray[i].username == username) {
+                return true
+            }
+        }
+        return false
+    }
 %>
 
 <div class="container">
@@ -57,7 +66,8 @@
             <h4>Joined: <span style="display: none;" id="moment-day"><%= user.createdAt %></span></h4>
             <h4><%= articles.length %> post<%= articles.length !== 1 ? "s" : "" %></h4>
             
-            <button class="btn btn-md btn-follow" id="following-expand"><strong><%= user.following.length - 1 %> following</strong></button>
+            <!-- Show a list of the people you're following -->
+            <button class="btn btn-md btn-follow" id="following-expand"><strong>following <span class="badge"><%= user.following.length - 1 %></span></strong></button>
             <ul id="following-list" style="display: none;" class="list-group">
                 <% if (user.following && user.following.length > 1) { %>
                     <% user.following.forEach(function(followee){ %>
@@ -69,7 +79,9 @@
                     <li class="list-group-item">Not following anyone</li>
                 <% } %>
             </ul>
-            <button class="btn btn-md btn-follow" id="follower-expand"><strong><%= user.followers.length %> follwers</strong></button>
+
+            <!-- Show a list of your followers -->
+            <button class="btn btn-md btn-follow" id="follower-expand"><strong>follwers <span class="badge"><%= user.followers.length %></span></strong></button>
             <ul id="follower-list" style="display: none;" class="list-group">
                 <% if (user.followers && user.followers.length >= 1) { %>
                     <% user.followers.forEach(function(follower){ %>
@@ -82,14 +94,18 @@
 
             <!-- Show a list of your fb friends if it's your profile -->
             <% if ((currentUser) && (user.id == currentUser.id)) { %>
-            <button class="btn btn-md btn-follow"><strong>Suggested</strong></button>
-                <ul id="follower-list" class="list-group">
+            <button class="btn btn-md btn-follow" id="friend-expand"><strong>Suggested <span class="badge"><%= friends.length %></span></strong></button>
+                <ul id="friend-list" style="display: none;" class="list-group">
                     <% if (friends && friends.length > 0) { %>
                         <% friends.forEach(function(friend) { %>
                             <li class="list-group-item">
-                                <div><%= friend.name %></div>
-                                <form class="form-horizontal" action="/user/follow/<%= friend.id %>/fb" method="POST">
-                                    <button class='btn btn-sm btn-default'>Follow</button>
+                                <form class="form-inline" action="/user/follow/<%= friend.id %>/fb" method="POST">
+                                    <% if (currentUser && isUsernameInMongoArray(user.following, friend.name)) { %>
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Followed
+                                    <% } else { %>
+                                        <button name="follow" class='btn btn-sm btn-default'>Follow</button>
+                                    <% } %>
+                                    <label for="follow"><%= friend.name %></label>
                                 </form>
                             </li>
                         <% }) %>
@@ -171,6 +187,10 @@
 
     $("#follower-expand").click(function() {
         $("#follower-list").toggle("fast", "linear");
+    });
+
+    $("#friend-expand").click(function() {
+        $("#friend-list").toggle("fast", "linear");
     });
 
     $("#tagline-edit").click(function() {
