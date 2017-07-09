@@ -12,6 +12,13 @@
     }
 %>
 
+<!--Remove the facebook redirect bug-->
+<script type="text/javascript">
+    if (window.location.hash && window.location.hash == '#_=_') {
+        window.location.hash = '';
+    }
+</script>
+
 <div class="container">
     <div class="row col-lg-12">
         <div class="page-header">
