@@ -35,6 +35,10 @@ footer {
   width: 115px;
 }
 
+.notif-badge {
+  background-color: #e74c3c;
+}
+
 .loginBtn {
   box-sizing: border-box;
   position: relative;
