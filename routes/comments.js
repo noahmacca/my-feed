@@ -29,12 +29,10 @@ router.post("/", (req, res) => {
                     article.comments.push(comment);
                     article.save();
 
-                    // send notification to article author
-                    var commentIds = article.comments.map((el) => {return el.author.id;});
+                    var commentIds = article.comments.map((el) => {return el.author.id});
 
                     // send notif to everyone who commented
                     User.find().where('_id').in(commentIds).exec((err, commenters) => {
-                        console.log(commenters.length);
                         for (var i = 0; i < commenters.length; i++) {
                             var commenter = commenters[i]
                             if (article.author.id.equals(commenter.id)) {

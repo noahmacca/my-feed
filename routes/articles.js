@@ -121,11 +121,26 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
             if (err) {
                 req.flash("error", err);
                 return res.redirect("back");
-            } else {
-                req.flash("success", "New Post Created");
-                return res.redirect(`/articles/${newArticle._id}`);
             }
-        })
+
+            // Send notification to all of your followers
+            User.findById(req.user.id).populate("followers").exec((err, user) => {
+                var followerIds = user.followers.map((el) => {return el._id});
+                User.find().where('_id').in(followerIds).exec((err, followers) => {
+                    console.log(followers.length)
+                    for (var i = 0; i < followers.length; i++) {
+                        followers[i].notifications.push({
+                            message: `${req.user.username} made a new post`,
+                            link: `/articles/${newArticle.id}`,
+                            isRead: false
+                        });
+                        followers[i].save();
+                    }
+                    req.flash("success", "New Post Created");
+                    return res.redirect(`/articles/${newArticle._id}`);
+                });
+            });
+        });
     });
 });
 
