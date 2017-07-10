@@ -1,6 +1,6 @@
 var express = require("express");
 var mongoose = require("mongoose");
-var router = express.Router({mergeParams: true});
+var router = express.Router({ mergeParams: true });
 var Article = require("../models/article");
 var Comment = require("../models/comment");
 var User = require("../models/user");
@@ -12,7 +12,7 @@ router.use(middleware.isLoggedIn);
 // CREATE COMMENT LOGIC
 router.post("/", (req, res) => {
     Article.findById(req.params.id).populate("comments").exec((err, article) => {
-        if(err) {
+        if (err) {
             req.flash("error", `Error creating comment: ${err.message}`);
             return res.redirect("back");
         } else {
@@ -23,35 +23,38 @@ router.post("/", (req, res) => {
                 username: req.user.username
             }
             Comment.create(comment, (err, comment) => {
-                if(err) {
+                if (err) {
                     console.log(err);
                 } else {
                     article.comments.push(comment);
                     article.save();
 
-                    var commentIds = article.comments.map((el) => {return el.author.id});
+                    // send notif to author
+                    User.findById(article.author.id, (err, author) => {
+                        author.notifications.push({
+                            message: `${req.user.username} commented on your post`,
+                            link: `/articles/${req.params.id}`,
+                            isRead: false
+                        });
+                        author.save();
+                        var commentIds = article.comments.map((el) => { return el.author.id });
 
-                    // send notif to everyone who commented
-                    User.find().where('_id').in(commentIds).exec((err, commenters) => {
-                        for (var i = 0; i < commenters.length; i++) {
-                            var commenter = commenters[i]
-                            if (article.author.id.equals(commenter.id)) {
-                                commenter.notifications.push({
-                                    message: `${req.user.username} commented on your post`,
-                                    link: `/articles/${req.params.id}`,
-                                    isRead: false
-                                });
-                            } else if (!commenter._id.equals(req.user.id)) {
-                                commenter.notifications.push({
-                                    message: `${req.user.username} commented on a post you're following`,
-                                    link: `/articles/${req.params.id}`,
-                                    isRead: false
-                                });
+                        // send notif to everyone who commented, who isn't the author or comment poster
+                        User.find().where('_id').in(commentIds).exec((err, commenters) => {
+                            for (var i = 0; i < commenters.length; i++) {
+                                var commenter = commenters[i]
+                                if ((!req.user._id.equals(commenter.id)) && (!article.author.id.equals(commenter.id))) {
+                                    commenter.notifications.push({
+                                        message: `${req.user.username} commented on a post you're following`,
+                                        link: `/articles/${req.params.id}`,
+                                        isRead: false
+                                    });
+                                }
+                                commenter.save();
                             }
-                            commenter.save();
-                        }
-                        req.flash("success", "Posted comment");
-                        return res.redirect(`/articles/${article._id}`);
+                            req.flash("success", "Posted comment");
+                            return res.redirect(`/articles/${article._id}`);
+                        });
                     });
                 }
             });
