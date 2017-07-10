@@ -121,6 +121,11 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
 
                     // 2. Add you to the user's follower list
                     followee.followers.push(user);
+                    followee.notifications.push({
+                        message: `You've just been followed by ${user.username}`,
+                        link: `/user/${user.id}`,
+                        isRead: false
+                    });
                     followee.save();
 
                     req.flash("success", `Successfully followed ${followee.username}`);
@@ -188,6 +193,26 @@ router.post("/user/:id/tagline", middleware.isLoggedIn, (req, res) => {
     } else {
         req.flash("error", `Not authorized to edit someone else's tagline!`);
         return res.redirect("back");
+    }
+});
+
+// Clear notifications
+router.post("/user/:id/notifs-read", middleware.isLoggedIn, (req, res) => {
+    if (req.params.id == req.user.id) {
+        User.findById(req.user.id, (err, user) => {
+            if(user.notifications) {
+                for (var i = 0; i < user.notifications.length; i++) {
+                    user.notifications[i].isRead = true;
+                }
+                // chop old notifications
+                user.notifications = user.notifications.slice(0, 10);
+                user.save();
+            }
+            return res.redirect('back');
+        });
+    } else {
+        req.flash('error', `Not authorized to mark someone else's notifications as read!`);
+        return res.redirect('back');
     }
 });
 

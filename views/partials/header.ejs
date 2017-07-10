@@ -40,7 +40,19 @@
 
     </head>
     <body id="page-top" data-spy="scroll" data-target=".navbar-custom-page">
- 
+
+        <% 
+        function numUnreadNotifs(notifArray) { 
+            var count = 0;
+            for (var i = 0; i < notifArray.length; i++) {
+                if(notifArray[i].isRead == false) {
+                    count++;
+                }
+            }
+            return count
+        }
+        %>
+
         <!-- Navigation -->
         <nav class="navbar navbar-custom-in-app" role="navigation">
             <div class="container">
@@ -67,8 +79,32 @@
                             <li><a href="/login">Login</a></li>
                             <li><a href="/register">Sign Up</a></li>
                         <% } else { %>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="badge"><%= currentUser.notifications ? numUnreadNotifs(currentUser.notifications) : 0 %></span>
+                                    Notifications  
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <% if (currentUser.notifications && currentUser.notifications.length > 0) { %>
+                                        <% currentUser.notifications.reverse().forEach(function(notification) { %>
+                                            <% if (notification.isRead == false) { %>
+                                                <li><a href="<%=currentUser.notifications[0].link%>"><span class="glyphicon glyphicon-dot" aria-hidden="true"></span> <%= notification.message %></a></li>
+                                            <% } else { %>
+                                                <li><a href="<%=currentUser.notifications[0].link%> "><%= notification.message %></a></li>
+                                            <% } %>
+                                        <% }); %>
+                                    <% } %>
+                                    <li role="separator" class="divider"></li>
+                                    <li>
+                                        <form id="notifs-read-form" action="/user/<%=currentUser.id%>/notifs-read" method="POST">
+                                            <a onclick="document.getElementById('notifs-read-form').submit();" href="javascript:{}">Mark All as Read</a>
+                                        </form>
+                                    </form>
+                                    </li>
+                                </ul>
+                            </li>
                             <li><a href="/user/<%= currentUser.id %>"><%=currentUser.username%></a></li>
-                            <li><a href="/articles/new">Post Article</a></li>
                             <li><a href="/logout">Logout</a></li>
                         <% } %>
                     </ul>

@@ -38,6 +38,13 @@ var userSchema = new mongoose.Schema({
                 ref: "Article"
             }
         }
+    ],
+    notifications: [
+        {
+            message: String,
+            link: String,
+            isRead: Boolean
+        }
     ]
 });
 

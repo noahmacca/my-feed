@@ -176,6 +176,12 @@ footer {
   font-size: 12px;
 }
 
+.glyphicon.glyphicon-dot:before {
+    content: "\25cf";
+    font-size: 1.5em;
+    color: #2980b9;
+}
+
 .navbar-custom-in-app {
   border-width: 0 0 1px;
   border-radius: 0;
@@ -213,6 +219,19 @@ footer {
   outline: none;
   background-color: transparent;
 }
+
+.navbar-custom-in-app .nav .dropdown .dropdown-menu a {
+  -webkit-transition: none;
+  -moz-transition: none;
+  transition: none;
+}
+
+.navbar-custom-in-app .nav .dropdown .dropdown-menu a:hover {
+  color: black;
+  outline: none;
+  background-color: whitesmoke;
+}
+
 .navbar-custom-in-app .nav li a:focus,
 .navbar-custom-in-app .nav li a:active {
   outline: none;
@@ -227,6 +246,21 @@ footer {
 .navbar-custom-in-app .nav li.active a:hover {
   color: white;
 }
+
+.dropdown-menu li form a{
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+}
+
+.dropdown-menu li form a {
+  text-decoration: none;
+}
+
 /*@media (min-width: 768px) {
   .navbar-custom-in-app {
     padding: 0 0;

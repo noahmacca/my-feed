@@ -85,11 +85,6 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
     });
 });
 
-// New Article Form
-router.get("/new", middleware.isLoggedIn, (req, res) => {
-    res.render("articles/new");
-});
-
 // CREATE - Add new article
 router.post("/", middleware.isLoggedIn, (req, res) => {
     if (!req.body.url) {
