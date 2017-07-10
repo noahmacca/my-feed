@@ -75,8 +75,8 @@ router.get("/user/:id", (req, res) => {
                 } else {
                     var articles = []
                     // filter out articles that don't belong to this user
-                    for (var i = 0; i < articles.length; i++) {
-                        if (user && article.author.id.equals(user.id)) {
+                    for (var i = 0; i < allArticles.length; i++) {
+                        if (user && allArticles[i].author.id.equals(user.id)) {
                             articles.push(allArticles[i]);
                         }
                     }
