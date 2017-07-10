@@ -10,6 +10,15 @@
         }
         return false
     }
+
+    function isUsernameInMongoArray(mongoArray, username) {
+        for (var i=0; i < mongoArray.length; i++) {
+            if (mongoArray[i].username == username) {
+                return true
+            }
+        }
+        return false
+    }
 %>
 
 <!--Remove the facebook redirect bug-->
@@ -34,6 +43,47 @@
                     <li id="feed-following" role="presentation"><a href="/articles">Following</a></li>
                     <li id="feed-all" role="presentation"><a href="/articles/all">All Users</a></li>
                     <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved</a></li>
+                </ul>
+            </div>
+            <hr>
+            <div>
+                <% if (friends) { %>
+                    <h3>Facebook Friends</h3>
+                    <ul id="friend-list" class="list-group">
+                        <% if (friends && friends.length > 0) { %>
+                            <% friends.forEach(function(friend) { %>
+                                <li class="list-group-item">
+                                    <form class="form-inline" action="/user/follow/<%= friend.id %>/fb" method="POST">
+                                        <% if (currentUser && isUsernameInMongoArray(currentUser.following, friend.name)) { %>
+                                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Following
+                                        <% } else { %>
+                                            <button name="follow" class='btn btn-sm btn-default'>Follow</button>
+                                        <% } %>
+                                        <label for="follow"><%= friend.name %></label>
+                                    </form>
+                                </li>
+                            <% }) %>
+                        <% } else { %>
+                            <li class="list-group-item">Go tell your facebook friends to join!</li>
+                        <% } %>
+                    </ul>
+                <% } %>
+            </div>
+            <div>
+                <h3>Most Followed</h3>
+                <ul id="friend-list" class="list-group">
+                    <% if (topUsers && topUsers.length > 0) { %>
+                        <% topUsers.forEach(function(topUser) { %>
+                            <li class="list-group-item">
+                                <form class="form-inline" action="/user/follow/<%= topUser.id %>/local" method="POST">
+                                    <button name="follow" class='btn btn-sm btn-default'>Follow</button>
+                                    <label for="follow"><a href="/user/<%=topUser._id%>"><%= topUser.username %> </a></label>
+                                </form>
+                            </li>
+                        <% }) %>
+                    <% } else { %>
+                        <li class="list-group-item">No suggestions</li>
+                    <% }%>
                 </ul>
             </div>
         </div>

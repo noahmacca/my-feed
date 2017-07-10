@@ -6,6 +6,8 @@ var User = require("../models/user");
 var middleware = require("../middleware");
 var request = require('request');
 var cheerio = require("cheerio");
+// var facebook = require('../utils/facebook');
+var userSuggestions = require('../utils/userSuggestions');
 
 // INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
@@ -21,9 +23,17 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
                     validArticles.push(allArticles[i]);
                 }
             }
+            
             validArticles = validArticles.slice(0, 40); // in case there's tons of matched articles
-            // check each article's author against user's following list
-            return res.render("articles/index", { articles: validArticles, highlight: "following" });
+
+            // populate list of people to follow
+            userSuggestions.find(req.user, (err, suggestions) => {
+                if(err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                return res.render('articles/index', { articles: validArticles, highlight: 'following', friends: suggestions.friends, topUsers: suggestions.topUsers })
+            });
         }
     });
 });
@@ -37,8 +47,14 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
             req.flash("error", `Error getting articles from db: ${err.message}`);
             return res.redirect("back");
         } else {
-            // check each article's author against user's following list
-            return res.render("articles/index", { articles: allArticles, highlight: "all"});
+            // populate list of people to follow
+            userSuggestions.find(req.user, (err, suggestions) => {
+                if(err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                return res.render('articles/index', { articles: allArticles, highlight: 'all', friends: suggestions.friends, topUsers: suggestions.topUsers })
+            });
         }
     });
 });
@@ -57,8 +73,14 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
                     validArticles.push(allArticles[i]);
                 }
             }
-            // check each article's author against user's following list
-            return res.render("articles/index", { articles: validArticles, highlight: "saved" });
+            // populate list of people to follow
+            userSuggestions.find(req.user, (err, suggestions) => {
+                if(err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                return res.render('articles/index', { articles: validArticles, highlight: 'saved', friends: suggestions.friends, topUsers: suggestions.topUsers })
+            });
         }
     });
 });
