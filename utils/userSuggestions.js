@@ -17,17 +17,8 @@ exports.find = function (user, next) {
     });
 }
 
-
+/////////////////////////////
 // Local functions
-function isUserInArray(userArray, test) {
-    // nested for loop but this will be max 10-20 users so should always be fast
-    for (var i = 0; i < userArray.length; i++) {
-        if (userArray[i]._id.equals(test._id)) {
-            return true
-        }
-    }
-    return false
-}
 
 // Return list of your facebook friends
 function facebookFriends(user, next) {
@@ -54,16 +45,7 @@ function mostFollowedUsers(user, next) {
         for (var i = 0; i < allUsers.length; i++) {
             console.log(allUsers[i].followers.length, allUsers[i].username);
         }
-        // filter out those which the user is already following
-            if (user.following && user.following.length > 0) {
-            var newUsers = [];
-            allUsers.forEach((popUser) => {
-                if (!isUserInArray(user.following, popUser)) {
-                    newUsers.push(popUser);
-                }
-            });
-            allUsers = newUsers;
-        }
+
         allUsers.slice(0,10);
         // todo: put some limits here to accommodate growing userbase
         return next(null, allUsers);

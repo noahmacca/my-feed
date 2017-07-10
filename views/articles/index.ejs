@@ -19,6 +19,15 @@
         }
         return false
     }
+
+    function isIdInMongoArray(mongoArray, id) {
+        for (var i=0; i < mongoArray.length; i++) {
+            if (mongoArray[i]._id == id) {
+                return true
+            }
+        }
+        return false
+    }
 %>
 
 <!--Remove the facebook redirect bug-->
@@ -75,8 +84,15 @@
                     <% if (topUsers && topUsers.length > 0) { %>
                         <% topUsers.forEach(function(topUser) { %>
                             <li class="list-group-item">
+                                <span class="badge"><%= topUser.followers.length %></span>
                                 <form class="form-inline" action="/user/follow/<%= topUser.id %>/local" method="POST">
-                                    <button name="follow" class='btn btn-sm btn-default'>Follow</button>
+                                    <% if (currentUser.username == topUser.username) { %>
+                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> You
+                                    <% } else if (currentUser && isIdInMongoArray(currentUser.following, topUser.id)) { %>
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Following
+                                    <% } else { %>
+                                        <button name="follow" class='btn btn-sm btn-default'>Follow</button>
+                                    <% } %>
                                     <label for="follow"><a href="/user/<%=topUser._id%>"><%= topUser.username %> </a></label>
                                 </form>
                             </li>
