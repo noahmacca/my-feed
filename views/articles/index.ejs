@@ -55,10 +55,11 @@
                 </ul>
             </div>
             <hr>
+            <h3>Suggestions</h3>
             <div>
                 <% if (friends) { %>
-                    <h3>Facebook Friends</h3>
-                    <ul id="friend-list" class="list-group">
+                    <button class="btn btn-default btn-md btn-block btn-suggest" id="fb-expand"><strong>Facebook Friends</strong></button>
+                    <ul id="fb-list" style="display: none;" class="list-group">
                         <% if (friends && friends.length > 0) { %>
                             <% friends.forEach(function(friend) { %>
                                 <li class="list-group-item">
@@ -79,8 +80,8 @@
                 <% } %>
             </div>
             <div>
-                <h3>Most Followed</h3>
-                <ul id="friend-list" class="list-group">
+                <button class="btn btn-default btn-md btn-block btn-suggest" id="top-user-expand"><strong>Most Followed</strong></button>
+                <ul id="top-user-list" style="display: none;" class="list-group">
                     <% if (topUsers && topUsers.length > 0) { %>
                         <% topUsers.forEach(function(topUser) { %>
                             <li class="list-group-item">
@@ -197,6 +198,14 @@
 
 <script src="/js/moment.js"></script>
 <script>
+    $("#fb-expand").click(function() {
+        $("#fb-list").toggle("fast");
+    });
+
+    $("#top-user-expand").click(function() {
+        $("#top-user-list").toggle("fast");
+    });
+
     $("[id=moment]").each(function(obj) {
         this.innerHTML = moment(this.innerHTML).local().format("MMMM D, h:mm a");
         this.style.display = "inline";

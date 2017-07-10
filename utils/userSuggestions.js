@@ -19,6 +19,7 @@ exports.find = function (user, next) {
 
 /////////////////////////////
 // Local functions
+/////////////////////////////
 
 // Return list of your facebook friends
 function facebookFriends(user, next) {
@@ -37,16 +38,8 @@ function mostFollowedUsers(user, next) {
     User.find({}, (err, allUsers) => {
         if (err)
             return next(err);
-        for (var i = 0; i < allUsers.length; i++) {
-            console.log(allUsers[i].followers.length, allUsers[i].username);
-        }
-        console.log('-------');
         allUsers = allUsers.sort(compareFollowerCount);
-        for (var i = 0; i < allUsers.length; i++) {
-            console.log(allUsers[i].followers.length, allUsers[i].username);
-        }
-
-        allUsers.slice(0,10);
+        allUsers = allUsers.slice(0,15);
         // todo: put some limits here to accommodate growing userbase
         return next(null, allUsers);
     });

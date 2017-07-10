@@ -107,7 +107,7 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
         } else {
             // Look up the followee add them to the list
             findUser(req.params.id, req.params.type, (err, followee) => {
-                // User.findById(req.params.id, (err, followee) => {
+                // This trusts that all of the friends returned by facebook have accounts already. Should be true without some weird database nuking
                 if (followee._id.equals(user._id)) {
                     req.flash("error", "You can't follow yourself!");
                     return res.redirect(`/user/${followee._id}`);
