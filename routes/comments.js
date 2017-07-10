@@ -3,6 +3,7 @@ var mongoose = require("mongoose");
 var router = express.Router({mergeParams: true});
 var Article = require("../models/article");
 var Comment = require("../models/comment");
+var User = require("../models/user");
 var middleware = require("../middleware");
 var moment = require("moment");
 
@@ -10,7 +11,7 @@ router.use(middleware.isLoggedIn);
 
 // CREATE COMMENT LOGIC
 router.post("/", (req, res) => {
-    Article.findById(req.params.id, (err, article) => {
+    Article.findById(req.params.id).populate("comments").exec((err, article) => {
         if(err) {
             req.flash("error", `Error creating comment: ${err.message}`);
             return res.redirect("back");
@@ -27,8 +28,33 @@ router.post("/", (req, res) => {
                 } else {
                     article.comments.push(comment);
                     article.save();
-                    req.flash("success", "Posted comment");
-                    return res.redirect(`/articles/${article._id}`);
+
+                    // send notification to article author
+                    var commentIds = article.comments.map((el) => {return el.author.id;});
+
+                    // send notif to everyone who commented
+                    User.find().where('_id').in(commentIds).exec((err, commenters) => {
+                        console.log(commenters.length);
+                        for (var i = 0; i < commenters.length; i++) {
+                            var commenter = commenters[i]
+                            if (article.author.id.equals(commenter.id)) {
+                                commenter.notifications.push({
+                                    message: `${req.user.username} commented on your post`,
+                                    link: `/articles/${req.params.id}`,
+                                    isRead: false
+                                });
+                            } else if (!commenter._id.equals(req.user.id)) {
+                                commenter.notifications.push({
+                                    message: `${req.user.username} commented on a post you're following`,
+                                    link: `/articles/${req.params.id}`,
+                                    isRead: false
+                                });
+                            }
+                            commenter.save();
+                        }
+                        req.flash("success", "Posted comment");
+                        return res.redirect(`/articles/${article._id}`);
+                    });
                 }
             });
         }
