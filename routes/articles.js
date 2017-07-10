@@ -127,7 +127,6 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
             User.findById(req.user.id).populate("followers").exec((err, user) => {
                 var followerIds = user.followers.map((el) => {return el._id});
                 User.find().where('_id').in(followerIds).exec((err, followers) => {
-                    console.log(followers.length)
                     for (var i = 0; i < followers.length; i++) {
                         followers[i].notifications.push({
                             message: `${req.user.username} made a new post`,
