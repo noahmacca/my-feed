@@ -41,6 +41,12 @@ module.exports = function (passport) {
                             }
                             // everyone follows themself
                             user.following.push(user);
+                            newUser.notifications.push({
+                                message: 'Welcome to MyFeed! Check out the latest activity here.',
+                                link: `/articles/all`,
+                                isRead: false
+                            });
+                            
                             user.save();
 
                             passport.authenticate("local")(req, null, () => {
@@ -114,6 +120,12 @@ module.exports = function (passport) {
                         newUser.facebook.email = (profile.emails ? profile.emails[0].value : '').toLowerCase();
                         newUser.following.push(newUser);
                         newUser.createdAt = moment().format();
+                        newUser.notifications.push({
+                            message: 'Welcome to MyFeed! Check out the latest activity here.',
+                            link: `/articles/all`,
+                            isRead: false
+                        });
+                        
 
                         newUser.save(function (err) {
                             if (err)
