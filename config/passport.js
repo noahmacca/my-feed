@@ -116,7 +116,7 @@ module.exports = function (passport) {
                         newUser.facebook.id = profile.id;
                         newUser.facebook.token = token;
                         newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
-                        newUser.username = newUser.facebook.name
+                        newUser.username = profile.name.givenName + profile.name.familyName;
                         newUser.facebook.email = (profile.emails ? profile.emails[0].value : '').toLowerCase();
                         newUser.following.push(newUser);
                         newUser.createdAt = moment().format();
