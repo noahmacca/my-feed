@@ -51,7 +51,7 @@
             
 
             <!-- Show a list of your followers -->
-            <button class="btn btn-default btn-md btn-follow" id="follower-expand"><strong>follwers <span class="badge"><%= user.followers.length %></span></strong></button>
+            <button class="btn btn-default btn-md btn-follow" id="follower-expand"><strong>followers <span class="badge"><%= user.followers.length %></span></strong></button>
             <ul id="follower-list" style="display: none;" class="list-group">
                 <% if (user.followers && user.followers.length >= 1) { %>
                     <% user.followers.forEach(function(follower){ %>
@@ -94,11 +94,11 @@
             </div>
             
             <!-- Remove Delete Account functionality for now - restore when implement user settings page -->
-            <!--<% if ((currentUser) && (user.id == currentUser.id)) { %> -->
-                <!--<form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 1<0>0px;" method="POST">-->
-                    <!--<button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>-->
-                <!--</form>-->
-            <!--<% } %>-->
+            <% if ((currentUser) && (user.id == currentUser.id)) { %> 
+                <form onsubmit="return deleteConfirm()" action="/user/<%= user._id %>/?_method=DELETE" style="margin-top: 1<0>0px;" method="POST">
+                    <button class="btn btn-danger btn-lg btn-wide"></span>Delete Account</button>
+                </form>
+            <% } %>
         </div>
         <div class="col-md-9">
             <div>
