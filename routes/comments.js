@@ -31,19 +31,22 @@ router.post("/", (req, res) => {
 
                     // send notif to author
                     User.findById(article.author.id, (err, author) => {
-                        author.notifications.push({
-                            message: `${req.user.username} commented on your post`,
-                            link: `/articles/${req.params.id}`,
-                            isRead: false
-                        });
-                        author.save();
+                        if (!article.author.id.equals(req.user._id)) {
+                            author.notifications.push({
+                                message: `${req.user.username} commented on your post`,
+                                link: `/articles/${req.params.id}`,
+                                isRead: false
+                            });
+                            author.save();
+                        }
+
                         var commentIds = article.comments.map((el) => { return el.author.id });
 
                         // send notif to everyone who commented, who isn't the author or comment poster
                         User.find().where('_id').in(commentIds).exec((err, commenters) => {
                             for (var i = 0; i < commenters.length; i++) {
                                 var commenter = commenters[i]
-                                if ((!req.user._id.equals(commenter.id)) && (!article.author.id.equals(commenter.id))) {
+                                if (!((req.user._id.equals(commenter._id)) || (article.author.id.equals(commenter._id)))) {
                                     commenter.notifications.push({
                                         message: `${req.user.username} commented on a post you're following`,
                                         link: `/articles/${req.params.id}`,
@@ -61,6 +64,7 @@ router.post("/", (req, res) => {
         }
     })
 });
+
 
 // EDIT COMMENT FORM
 router.get("/:comment_id/edit", middleware.checkCommentOwnership, (req, res) => {
