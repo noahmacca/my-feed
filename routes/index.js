@@ -216,6 +216,27 @@ router.post("/user/:id/notifs-read", middleware.isLoggedIn, (req, res) => {
     }
 });
 
+// NOTIFICATION REDIRECT - mark as read and redirect
+router.get("/notifRedirect", middleware.isLoggedIn, (req, res) => {
+    if (!req.query.redirect || !req.query.notifId) {
+        req.flash('error', 'malformed notification link');
+        return res.redirect('back');
+    }
+    var notifId = req.query.notifId;
+    var redirect = req.query.redirect;
+    
+    // mark notification as read
+    User.findById(req.user.id, (err, user) => {
+        for (var i = 0; i < user.notifications.length; i++) {
+            if (user.notifications[i].id == notifId) {
+                user.notifications[i].isRead = true;
+            }
+        }
+        user.save();
+        return res.redirect(redirect);
+    });
+});
+
 module.exports = router;
 
 // Local functions
