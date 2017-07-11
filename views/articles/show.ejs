@@ -72,7 +72,7 @@
                     </p>-->
                     <div style="margin-top: 30px;">
                         <form action="/articles/<%= article._id %>/comments" method="POST">
-                            <input class="form-control" type="text" name="comment[text]" placeholder="Comment">
+                            <textarea class="form-control" type="text" rows="5" name="comment[text]" placeholder="Comment"></textarea>
                             <div class="margin-top: 55px;">
                                 <button class="btn btn-md btn-default">Add Comment</button>
                             </div>
