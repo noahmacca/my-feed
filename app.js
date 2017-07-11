@@ -57,6 +57,12 @@ app.use("/", indexRoutes);
 app.use("/articles", articleRoutes);
 app.use("/articles/:id/comments", commentRoutes);
 
+app.use(function(req, res, next){
+    res.status(404);
+    res.render('404', { url: req.url });
+    return;
+});
+
 app.listen(process.env.PORT, process.env.IP, (err, res) => {
     console.log(`server started on port ${process.env.PORT}`);
 });
