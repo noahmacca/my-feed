@@ -129,7 +129,7 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
                     followee.save();
 
                     req.flash("success", `Successfully followed ${followee.username}`);
-                    return res.redirect(`/user/${followee._id}`);
+                    return res.redirect(`back`);
                 }
             });
         }
