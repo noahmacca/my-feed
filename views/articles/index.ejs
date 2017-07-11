@@ -109,18 +109,22 @@
             <div id="new-post-form" style="display: none;">
                 <form action="/articles" method="POST" style="margin-bottom: 40px;">
                     <div class="form-group" style="margin-top: 10px;">
-                        <input id="url-input" class="form-control" type="text" name="url" placeholder="Url (include 'http')">
+                        <label for="url-input">Article Link</label>
+                        <input id="url-input" class="form-control" type="text" name="url" placeholder="(include 'http')">
                     </div>
                     <div class="form-group">
-                        <textarea id="comment-input" class="form-control" required="true" rows="5" name="desc" placeholder="Your Comments"></textarea>
+                        <label for="comment-input">Your Comments</label>
+                        <textarea id="comment-input" class="form-control" required="true" rows="8" name="desc"></textarea>
                     </div>
-                    <% if (taggableUsers.length > 1) { %>
+                    <% if (taggableUsers.length > 0) { %>
                         <div class="form-group">
-                            <select multiple name="taggedFriends" class="form-control">        
+                            <label for="tagUsersSelector">Tag Friends</label>
+                            <select multiple name="taggedFriends" class="form-control" id="tagUsersSelector" size=8>
                                 <% taggableUsers.forEach(function(taggableUser) { %>
                                     <option value="<%= taggableUser.id %>"><%=taggableUser.username %> </option>
                                 <% }) %>
                             </select>
+                            <p class="help-block">They will be notified of your post. Tag multiple with shift+click or ctrl/cmd+click.</p>
                         </div>
                     <% } %>
                     <div class="form-group">
