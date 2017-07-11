@@ -32,7 +32,18 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
-                return res.render('articles/index', { articles: validArticles, highlight: 'following', friends: suggestions.friends, topUsers: suggestions.topUsers })
+
+                // get list of people you can tag
+                User.findById(req.user.id, (err, user) => {
+                    if (err) {
+                        req.flash('error', err.message);
+                        return res.redirect('back');
+                    }
+                    var taggableUsers = user.following.concat(user.followers);
+                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
+                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
+                    return res.render('articles/index', { articles: validArticles, highlight: 'following', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
+                });
             });
         }
     });
@@ -53,7 +64,18 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
-                return res.render('articles/index', { articles: allArticles, highlight: 'all', friends: suggestions.friends, topUsers: suggestions.topUsers })
+
+               // get list of people you can tag
+                User.findById(req.user.id, (err, user) => {
+                    if (err) {
+                        req.flash('error', err.message);
+                        return res.redirect('back');
+                    }
+                    var taggableUsers = user.following.concat(user.followers);
+                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
+                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
+                    return res.render('articles/index', { articles: allArticles, highlight: 'all', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
+                });
             });
         }
     });
@@ -79,7 +101,18 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
-                return res.render('articles/index', { articles: validArticles, highlight: 'saved', friends: suggestions.friends, topUsers: suggestions.topUsers })
+
+                // get list of people you can tag
+                User.findById(req.user.id, (err, user) => {
+                    if (err) {
+                        req.flash('error', err.message);
+                        return res.redirect('back');
+                    }
+                    var taggableUsers = user.following.concat(user.followers);
+                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
+                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
+                    return res.render('articles/index', { articles: validArticles, highlight: 'saved', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
+                });
             });
         }
     });
@@ -135,8 +168,27 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
                         });
                         followers[i].save();
                     }
-                    req.flash("success", "New Post Created");
-                    return res.redirect(`/articles/${newArticle._id}`);
+
+                    // Send specific notification to each tagged user
+                    if (req.body.taggedFriends) {
+                        User.find().where('_id').in(req.body.taggedFriends).exec((err, tagged) => {
+                            for (var i = 0; i < tagged.length; i++) {
+                                tagged[i].notifications.push({
+                                    message: `${req.user.username} tagged you in a post!`,
+                                    link: `/articles/${newArticle.id}`,
+                                    isRead: false
+                                });
+                                tagged[i].save();
+                                newArticle.taggedUsers.push(tagged[i]);
+                            }
+                            newArticle.save();
+                            req.flash("success", "New Post Created");
+                            return res.redirect(`/articles/${newArticle._id}`);
+                        });
+                    } else {
+                        req.flash("success", "New Post Created");
+                        return res.redirect(`/articles/${newArticle._id}`);
+                    }
                 });
             });
         });

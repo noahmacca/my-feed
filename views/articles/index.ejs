@@ -112,8 +112,17 @@
                         <input id="url-input" class="form-control" type="text" name="url" placeholder="Url (include 'http')">
                     </div>
                     <div class="form-group">
-                        <textarea id="comment-input" class="form-control" required="true" rows="5" type="text" name="desc" placeholder="Your Comments"></textarea>
+                        <textarea id="comment-input" class="form-control" required="true" rows="5" name="desc" placeholder="Your Comments"></textarea>
                     </div>
+                    <% if (taggableUsers.length > 1) { %>
+                        <div class="form-group">
+                            <select multiple name="taggedFriends" class="form-control">        
+                                <% taggableUsers.forEach(function(taggableUser) { %>
+                                    <option value="<%= taggableUser.id %>"><%=taggableUser.username %> </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    <% } %>
                     <div class="form-group">
                         <button class="btn btn-lg btn-primary btn-block">Submit</button>
                     </div>
@@ -126,7 +135,7 @@
                         <div class="empty-feed well" style="padding: 4%;">
                             <h1>Getting Started</h1>
                             <ol class="getting-started-list">
-                                <h4><li>Post an article using the form above! It'll show up in your feed and your <a href="/user/<%=currentUser._id%>">public profile</a>.</li></h4>
+                                <h4><li>Post an article using the form above! We've pre-populated it with a sample url. It'll show up in your feed and your <a href="/user/<%=currentUser._id%>">public profile</a>.</li></h4>
                                 <h4><li>Check out the <a href="/articles/all">All Users</a> feed to see what others are posting, and comment on anything you find interesting</li></h4>
                                 <h4><li>Follow other users to see their posts</li></h4>
                                 <h4><li>Link your friends straight to discussions with the share button</li></h4>
@@ -151,7 +160,7 @@
                                 </div>
                             </h3>
                             
-                            <p><%= article.desc %></p>
+                            <p class='pre-wrap'><%= article.desc %></p>
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <h4><a href="<%=article.url%>"><%= article.title %></a></h4>
@@ -196,7 +205,9 @@
     </div>
 </div>
 
+<!-- moment.js for datetime localization -->
 <script src="/js/moment.js"></script>
+
 <script>
     $("#fb-expand").click(function() {
         $("#fb-list").toggle("fast");

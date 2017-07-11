@@ -19,6 +19,15 @@ var articleSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Comment"
         }
+    ],
+    taggedUsers: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            username: String
+        }
     ]
 });
 
