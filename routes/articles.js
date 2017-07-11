@@ -180,6 +180,9 @@ router.get("/:id", (req, res) => {
         if (err) {
             req.flash("error", `Error finding article: ${err.message}`);
             return res.redirect("back");
+        } else if (!foundArticle) {
+            req.flash('error', `Sorry, that article has been deleted!`);
+            return res.redirect('back');
         } else {
             return res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl });
         }
