@@ -93,9 +93,9 @@
                                     <% if (currentUser.notifications && currentUser.notifications.length > 0) { %>
                                         <% currentUser.notifications.reverse().forEach(function(notification) { %>
                                             <% if (notification.isRead == false) { %>
-                                                <li><a href="<%=currentUser.notifications[0].link%>"><span class="glyphicon glyphicon-dot" aria-hidden="true"></span> <%= notification.message %></a></li>
+                                                <li><a href="<%=notification.link%>"><span class="glyphicon glyphicon-dot" aria-hidden="true"></span> <%= notification.message %></a></li>
                                             <% } else { %>
-                                                <li><a href="<%=currentUser.notifications[0].link%> "><%= notification.message %></a></li>
+                                                <li><a href="<%=notification.link%> "><%= notification.message %></a></li>
                                             <% } %>
                                         <% }); %>
                                     <% } %>
