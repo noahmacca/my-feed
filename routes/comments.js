@@ -1,11 +1,16 @@
 var express = require("express");
 var mongoose = require("mongoose");
+var moment = require("moment");
 var router = express.Router({ mergeParams: true });
+
+// mongo models
 var Article = require("../models/article");
 var Comment = require("../models/comment");
 var User = require("../models/user");
+
+// helper functions
 var middleware = require("../middleware");
-var moment = require("moment");
+var notifications = require('../utils/notifications');
 
 router.use(middleware.isLoggedIn);
 
@@ -26,34 +31,27 @@ router.post("/", (req, res) => {
                 if (err) {
                     console.log(err);
                 } else {
+                    // add comments to article
                     article.comments.push(comment);
                     article.save();
 
                     // send notif to author
                     User.findById(article.author.id, (err, author) => {
                         if (!article.author.id.equals(req.user._id)) {
-                            author.notifications.push({
-                                message: `${req.user.username} commented on your post`,
-                                link: `/articles/${req.params.id}`,
-                                isRead: false
-                            });
+                            author.notifications.push(notifications.new(`${req.user.username} commented on your post`, `/articles/${req.params.id}`));
                             author.save();
                         }
 
+                        // Send notif to commenters who aren't current user or author
                         var commentIds = article.comments.map((el) => { return el.author.id });
-
-                        // send notif to everyone who commented, who isn't the author or comment poster
-                        User.find().where('_id').in(commentIds).exec((err, commenters) => {
-                            for (var i = 0; i < commenters.length; i++) {
-                                var commenter = commenters[i]
-                                if (!((req.user._id.equals(commenter._id)) || (article.author.id.equals(commenter._id)))) {
-                                    commenter.notifications.push({
-                                        message: `${req.user.username} commented on a post you're following`,
-                                        link: `/articles/${req.params.id}`,
-                                        isRead: false
-                                    });
-                                }
-                                commenter.save();
+                        commentIds = commentIds.filter((commentId) => {
+                            return !((req.user._id.equals(commentId)) || (article.author.id.equals(commentId)))
+                        });
+                        var commentNotif = notifications.new(`${req.user.username} commented on a post you're following`, `/articles/${req.params.id}`);
+                        notifications.sendToUsers(commentIds, commentNotif, (err) => {
+                            if (err) {
+                                req.flash("error", err.message);
+                                return res.redirect("back");
                             }
                             req.flash("success", "Posted comment");
                             return res.redirect(`/articles/${article._id}`);

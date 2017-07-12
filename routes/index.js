@@ -6,6 +6,7 @@ var Article = require("../models/article");
 var moment = require("moment");
 var middleware = require("../middleware");
 var facebook = require('../utils/facebook');
+var notifications = require('../utils/notifications');
 var mongoose = require("mongoose");
 
 // Landing page
@@ -121,11 +122,7 @@ router.post("/user/follow/:id/:type", middleware.isLoggedIn, (req, res) => {
 
                     // 2. Add you to the user's follower list
                     followee.followers.push(user);
-                    followee.notifications.push({
-                        message: `You've just been followed by ${user.username}`,
-                        link: `/user/${user.id}`,
-                        isRead: false
-                    });
+                    followee.notifications.push(notifications.new(`You've just been followed by ${user.username}`, `/user/${user.id}`));
                     followee.save();
 
                     req.flash("success", `Successfully followed ${followee.username}`);
