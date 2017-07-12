@@ -20,6 +20,15 @@ notifications.sendToUsers = function (sendIds, notif, next) {
             notifRecipients[i].notifications.push(notif);
             notifRecipients[i].save();
         }
+
+        // remap to taggedUser schema 
+        notifRecipients = notifRecipients.map((i) => {
+            return {
+                id: i._id,
+                username: i.username
+            }
+        });
+
         return next(null, notifRecipients);
     });
 }

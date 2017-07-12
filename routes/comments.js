@@ -53,8 +53,27 @@ router.post("/", (req, res) => {
                                 req.flash("error", err.message);
                                 return res.redirect("back");
                             }
-                            req.flash("success", "Posted comment");
-                            return res.redirect(`/articles/${article._id}`);
+
+                            // Send notification to each tagged user
+                            if (req.body.taggedFriends) {
+                                var notifTagged = notifications.new(`${req.user.username} tagged you in a comment!`, `/articles/${req.params.id}`);
+                                notifications.sendToUsers(req.body.taggedFriends, notifTagged, (err, notifRecipients) => {
+                                    if (err) {
+                                        req.flash("error", err.message);
+                                        return res.redirect("back");
+                                    }
+
+                                    // Add tagged users to current article
+                                    comment.taggedUsers = notifRecipients;
+                                    comment.save();
+
+                                    req.flash("success", "Posted comment");
+                                    return res.redirect(`/articles/${article._id}`);
+                                });
+                            } else {
+                                req.flash("success", "Posted comment");
+                                return res.redirect(`/articles/${article._id}`);
+                            }
                         });
                     });
                 }

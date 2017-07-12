@@ -23,7 +23,7 @@
             <div>
                 <strong>Tagged: </strong>
                 <% article.taggedUsers.forEach(function(tagged) { %>
-                    <span><a href="/user/<%= tagged._id %>"><%= tagged.username %></a></span>
+                    <span><a href="/user/<%= tagged.id %>"><%= tagged.username %></a></span>
                 <% }); %>
             </div>
             <div class="text-center">
@@ -62,6 +62,13 @@
                                 </h4>
                                 <p><em><span style="display: none;" id="moment"><%= comment.createdAt %></span></em></p>
                                 <p class="pre-wrap"><%= comment.text %></p>
+                                <% if (comment.taggedUsers) { %>
+                                    <div>
+                                        <% comment.taggedUsers.forEach(function(taggedUser) { %>
+                                            <span>cc <a href="/user/<%= taggedUser.id %>">@<%= taggedUser.username %></a></span>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
                                 <% if (currentUser && comment.author.id && comment.author.id.equals(currentUser._id)) { %>
                                     <form class="pull-left" action="/articles/<%= article._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
                                         <button class="btn btn-default btn-xs pull-left"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> Delete</button>
