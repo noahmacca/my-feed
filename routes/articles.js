@@ -18,34 +18,27 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         } else {
             var validArticles = [];
-            for (var i=0; i < allArticles.length; i++) {
-                if(isFolloweeInArray(req.user.following, allArticles[i].author.id)) {
+            for (var i = 0; i < allArticles.length; i++) {
+                if (isFolloweeInArray(req.user.following, allArticles[i].author.id)) {
                     validArticles.push(allArticles[i]);
                 }
             }
-            
+
             validArticles = validArticles.slice(0, 40); // in case there's tons of matched articles
 
             // populate list of people to follow
             userSuggestions.find(req.user, (err, suggestions) => {
-                if(err) {
+                if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
                 // get list of people you can tag
-                User.findById(req.user.id, (err, user) => {
+                getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
                     }
-                    var taggableUsers = user.following.concat(user.followers);
-                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
-                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
-                    var taggableIds = taggableUsers.map((el) => { return el.id });
-                    taggableUsers = taggableUsers.filter(function(item, pos) {
-                        return taggableIds.indexOf(item.id) == pos;
-                    });
                     return res.render('articles/index', { articles: validArticles, highlight: 'following', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
                 });
             });
@@ -64,20 +57,17 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
         } else {
             // populate list of people to follow
             userSuggestions.find(req.user, (err, suggestions) => {
-                if(err) {
+                if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
-               // get list of people you can tag
-                User.findById(req.user.id, (err, user) => {
+                // get list of people you can tag
+                getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
                     }
-                    var taggableUsers = user.following.concat(user.followers);
-                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
-                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
                     return res.render('articles/index', { articles: allArticles, highlight: 'all', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
                 });
             });
@@ -94,27 +84,24 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         } else {
             var validArticles = [];
-            for (var i=0; i < allArticles.length; i++) {
-                if(isFolloweeInArray(req.user.savedArticles, allArticles[i]._id)) {
+            for (var i = 0; i < allArticles.length; i++) {
+                if (isFolloweeInArray(req.user.savedArticles, allArticles[i]._id)) {
                     validArticles.push(allArticles[i]);
                 }
             }
             // populate list of people to follow
             userSuggestions.find(req.user, (err, suggestions) => {
-                if(err) {
+                if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
                 // get list of people you can tag
-                User.findById(req.user.id, (err, user) => {
+                getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
                     }
-                    var taggableUsers = user.following.concat(user.followers);
-                    taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
-                    taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
                     return res.render('articles/index', { articles: validArticles, highlight: 'saved', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
                 });
             });
@@ -138,21 +125,21 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
             username: req.user.username
         }
     }
-    
+
     // query the provided url to get the title, snippet etc.
     request(url, (err, response, body) => {
-        if(err) {
+        if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
         var $ = cheerio.load(body);
-        
+
         article.title = $("title").text().split("|")[0]; // todo: filter out all of the other junk that can be in titles
         var pTags = []
         $("body p").each((i, elem) => {
             pTags[i] = $(elem).text();
         });
-        article.articleDesc = pTags.join(" ").split(" ").slice(0,50).join(" "); // Not perfect at handling various spaces 
+        article.articleDesc = pTags.join(" ").split(" ").slice(0, 50).join(" "); // Not perfect at handling various spaces 
         article.publication = url.split("/")[2];
         Article.create(article, (err, newArticle) => {
             if (err) {
@@ -162,7 +149,7 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
 
             // Send notification to all of your followers
             User.findById(req.user.id).populate("followers").exec((err, user) => {
-                var followerIds = user.followers.map((el) => {return el._id});
+                var followerIds = user.followers.map((el) => { return el._id });
                 User.find().where('_id').in(followerIds).exec((err, followers) => {
                     for (var i = 0; i < followers.length; i++) {
                         followers[i].notifications.push({
@@ -248,7 +235,7 @@ router.get("/:id", (req, res) => {
 // EDIT ARTICLE
 router.get("/:id/edit", middleware.isLoggedIn, middleware.checkPostOwnership, (req, res) => {
     Article.findById(req.params.id, (err, article) => {
-        if(err) {
+        if (err) {
             req.flash("error", `Error finding article: ${err.message}`);
             return res.redirect("back");
         } else {
@@ -290,11 +277,31 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
 
 module.exports = router;
 
+// Local Functions
 function isFolloweeInArray(followingArray, followee_id) {
-    for (var i=0; i < followingArray.length; i++) {
+    for (var i = 0; i < followingArray.length; i++) {
         if (followingArray[i]._id.equals(followee_id)) {
             return true
         }
     }
     return false
+}
+
+function getTaggableUsers(reqUser, next) {
+    User.findById(reqUser.id, (err, user) => {
+        if (err)
+            return next(err)
+
+        var taggableUsers = user.following.concat(user.followers);
+        taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(reqUser._id)) }); // remove own userId from list
+        taggableUsers = taggableUsers.map((el) => { return { "username": el.username, "id": String(el._id) } }); // remove junk from object
+        var taggableIds = taggableUsers.map((el) => { return el.id }); // get pure array of just ids for dupe detection
+        
+        // remove dupes
+        taggableUsers = taggableUsers.filter(function (item, pos) {
+            return taggableIds.indexOf(item.id) == pos;
+        });
+
+        return next(null, taggableUsers);
+    });
 }
