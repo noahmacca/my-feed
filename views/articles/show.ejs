@@ -78,9 +78,23 @@
                     </p>-->
                     <div style="margin-top: 30px;">
                         <form action="/articles/<%= article._id %>/comments" method="POST">
-                            <textarea class="form-control" type="text" rows="5" name="comment[text]" placeholder="Comment"></textarea>
+                            <div class="form-group">
+                                <label for="comment-box">Comment</label>
+                                <textarea id='comment-box'class="form-control" type="text" rows="5" name="comment[text]" placeholder="Comment"></textarea>
+                            </div>
+                            <% if (taggableUsers.length > 0) { %>
+                                <div class="form-group">
+                                    <label for="tagUsersSelector">Tag Friends</label>
+                                    <select multiple name="taggedFriends" class="form-control" id="tagUsersSelector" size=5>
+                                        <% taggableUsers.forEach(function(taggableUser) { %>
+                                            <option value="<%= taggableUser.id %>"><%=taggableUser.username %> </option>
+                                        <% }) %>
+                                    </select>
+                                    <p class="help-block">They will be notified of your post. Tag multiple with shift+click or ctrl/cmd+click.</p>
+                                </div>
+                            <% } %>
                             <div class="margin-top: 55px;">
-                                <button class="btn btn-md btn-default">Add Comment</button>
+                                <button class="btn btn-md btn-block btn-default">Submit</button>
                             </div>
                         </form>
                     </div>

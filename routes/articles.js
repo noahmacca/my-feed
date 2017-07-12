@@ -199,7 +199,14 @@ router.get("/:id", (req, res) => {
             req.flash('error', `Sorry, that article has been deleted!`);
             return res.redirect('back');
         } else {
-            return res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl });
+            // load a user's taggable users
+            userUtils.getTaggableUsers(req.user, (err, taggableUsers) => {
+                if (err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                return res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl, taggableUsers: taggableUsers });
+            });
         }
     });
 });
