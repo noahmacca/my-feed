@@ -4,10 +4,8 @@ var router = express.Router();
 var Article = require("../models/article");
 var User = require("../models/user");
 var middleware = require("../middleware");
-var request = require('request');
-var cheerio = require("cheerio");
 // var facebook = require('../utils/facebook');
-var userSuggestions = require('../utils/userSuggestions');
+var userUtils = require('../utils/userUtils');
 
 // INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
@@ -27,14 +25,14 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
             validArticles = validArticles.slice(0, 40); // in case there's tons of matched articles
 
             // populate list of people to follow
-            userSuggestions.find(req.user, (err, suggestions) => {
+            userUtils.getSuggestedFollows(req.user, (err, suggestions) => {
                 if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
                 // get list of people you can tag
-                getTaggableUsers(req.user, (err, taggableUsers) => {
+                userUtils.getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
@@ -56,14 +54,14 @@ router.get("/all", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         } else {
             // populate list of people to follow
-            userSuggestions.find(req.user, (err, suggestions) => {
+            userUtils.getSuggestedFollows(req.user, (err, suggestions) => {
                 if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
                 // get list of people you can tag
-                getTaggableUsers(req.user, (err, taggableUsers) => {
+                userUtils.getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
@@ -90,14 +88,14 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
                 }
             }
             // populate list of people to follow
-            userSuggestions.find(req.user, (err, suggestions) => {
+            userUtils.getSuggestedFollows(req.user, (err, suggestions) => {
                 if (err) {
                     req.flash('error', err.message);
                     return res.redirect('back');
                 }
 
                 // get list of people you can tag
-                getTaggableUsers(req.user, (err, taggableUsers) => {
+                userUtils.getTaggableUsers(req.user, (err, taggableUsers) => {
                     if (err) {
                         req.flash('error', err.message);
                         return res.redirect('back');
@@ -115,72 +113,46 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
         req.flash("error", "Please specify a url for the article you'd like to post!");
         return res.redirect("back");
     }
-    var url = req.body.url; // todo: auto-add http if they don't include it, in a way that still allows request to determine if invalid uri
-    var article = {
-        url: url,
-        desc: req.body.desc,
-        createdAt: moment().format(),
-        author: {
-            id: req.user._id,
-            username: req.user.username
-        }
-    }
 
     // query the provided url to get the title, snippet etc.
-    request(url, (err, response, body) => {
+    userUtils.parseArticle(req, (err, newArticle) => {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        var $ = cheerio.load(body);
+        // Send notification to all of your followers
+        User.findById(req.user.id).populate("followers").exec((err, user) => {
+            var followerIds = user.followers.map((el) => { return el._id });
+            User.find().where('_id').in(followerIds).exec((err, followers) => {
+                for (var i = 0; i < followers.length; i++) {
+                    followers[i].notifications.push({
+                        message: `${req.user.username} made a new post`,
+                        link: `/articles/${newArticle.id}`,
+                        isRead: false
+                    });
+                    followers[i].save();
+                }
 
-        article.title = $("title").text().split("|")[0]; // todo: filter out all of the other junk that can be in titles
-        var pTags = []
-        $("body p").each((i, elem) => {
-            pTags[i] = $(elem).text();
-        });
-        article.articleDesc = pTags.join(" ").split(" ").slice(0, 50).join(" "); // Not perfect at handling various spaces 
-        article.publication = url.split("/")[2];
-        Article.create(article, (err, newArticle) => {
-            if (err) {
-                req.flash("error", err);
-                return res.redirect("back");
-            }
-
-            // Send notification to all of your followers
-            User.findById(req.user.id).populate("followers").exec((err, user) => {
-                var followerIds = user.followers.map((el) => { return el._id });
-                User.find().where('_id').in(followerIds).exec((err, followers) => {
-                    for (var i = 0; i < followers.length; i++) {
-                        followers[i].notifications.push({
-                            message: `${req.user.username} made a new post`,
-                            link: `/articles/${newArticle.id}`,
-                            isRead: false
-                        });
-                        followers[i].save();
-                    }
-
-                    // Send specific notification to each tagged user
-                    if (req.body.taggedFriends) {
-                        User.find().where('_id').in(req.body.taggedFriends).exec((err, tagged) => {
-                            for (var i = 0; i < tagged.length; i++) {
-                                tagged[i].notifications.push({
-                                    message: `${req.user.username} tagged you in a post!`,
-                                    link: `/articles/${newArticle.id}`,
-                                    isRead: false
-                                });
-                                tagged[i].save();
-                                newArticle.taggedUsers.push(tagged[i]);
-                            }
-                            newArticle.save();
-                            req.flash("success", "New Post Created");
-                            return res.redirect(`/articles/${newArticle._id}`);
-                        });
-                    } else {
+                // Send specific notification to each tagged user
+                if (req.body.taggedFriends) {
+                    User.find().where('_id').in(req.body.taggedFriends).exec((err, tagged) => {
+                        for (var i = 0; i < tagged.length; i++) {
+                            tagged[i].notifications.push({
+                                message: `${req.user.username} tagged you in a post!`,
+                                link: `/articles/${newArticle.id}`,
+                                isRead: false
+                            });
+                            tagged[i].save();
+                            newArticle.taggedUsers.push(tagged[i]);
+                        }
+                        newArticle.save();
                         req.flash("success", "New Post Created");
                         return res.redirect(`/articles/${newArticle._id}`);
-                    }
-                });
+                    });
+                } else {
+                    req.flash("success", "New Post Created");
+                    return res.redirect(`/articles/${newArticle._id}`);
+                }
             });
         });
     });
@@ -285,23 +257,4 @@ function isFolloweeInArray(followingArray, followee_id) {
         }
     }
     return false
-}
-
-function getTaggableUsers(reqUser, next) {
-    User.findById(reqUser.id, (err, user) => {
-        if (err)
-            return next(err)
-
-        var taggableUsers = user.following.concat(user.followers);
-        taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(reqUser._id)) }); // remove own userId from list
-        taggableUsers = taggableUsers.map((el) => { return { "username": el.username, "id": String(el._id) } }); // remove junk from object
-        var taggableIds = taggableUsers.map((el) => { return el.id }); // get pure array of just ids for dupe detection
-        
-        // remove dupes
-        taggableUsers = taggableUsers.filter(function (item, pos) {
-            return taggableIds.indexOf(item.id) == pos;
-        });
-
-        return next(null, taggableUsers);
-    });
 }
