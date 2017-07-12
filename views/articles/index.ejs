@@ -13,7 +13,8 @@
 
     function isUsernameInMongoArray(mongoArray, username) {
         for (var i=0; i < mongoArray.length; i++) {
-            if (mongoArray[i].username.toLowerCase() == username.toLowerCase()) {
+            if (mongoArray[i].username.toLowerCase().split(' ').join('') == username.toLowerCase().split(' ').join('')) {
+                // normalize for case and whitespace to be safe
                 return true
             }
         }
