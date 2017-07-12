@@ -6,6 +6,7 @@ var User = require("../models/user");
 var middleware = require("../middleware");
 // var facebook = require('../utils/facebook');
 var userUtils = require('../utils/userUtils');
+var notifications = require('../utils/notifications');
 
 // INDEX - show article feed of followed users
 router.get("/", middleware.isLoggedIn, (req, res) => {
@@ -109,43 +110,42 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
 
 // CREATE - Add new article
 router.post("/", middleware.isLoggedIn, (req, res) => {
+    // todo: this function is slow. can I leave callbacks running in the background?
     if (!req.body.url) {
         req.flash("error", "Please specify a url for the article you'd like to post!");
         return res.redirect("back");
     }
 
     // query the provided url to get the title, snippet etc.
-    userUtils.parseArticle(req, (err, newArticle) => {
+    userUtils.parseAndCreateArticle(req, (err, newArticle) => {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
+
         // Send notification to all of your followers
         User.findById(req.user.id).populate("followers").exec((err, user) => {
             var followerIds = user.followers.map((el) => { return el._id });
-            User.find().where('_id').in(followerIds).exec((err, followers) => {
-                for (var i = 0; i < followers.length; i++) {
-                    followers[i].notifications.push({
-                        message: `${req.user.username} made a new post`,
-                        link: `/articles/${newArticle.id}`,
-                        isRead: false
-                    });
-                    followers[i].save();
+            var notifFollower = notifications.new(`${req.user.username} made a new post`, `/articles/${newArticle.id}`);
+            notifications.sendToUsers(followerIds, notifFollower, (err) => {
+                if (err) {
+                    req.flash("error", err.message);
+                    return res.redirect("back");
                 }
 
-                // Send specific notification to each tagged user
+                // Send notification to each tagged user
                 if (req.body.taggedFriends) {
-                    User.find().where('_id').in(req.body.taggedFriends).exec((err, tagged) => {
-                        for (var i = 0; i < tagged.length; i++) {
-                            tagged[i].notifications.push({
-                                message: `${req.user.username} tagged you in a post!`,
-                                link: `/articles/${newArticle.id}`,
-                                isRead: false
-                            });
-                            tagged[i].save();
-                            newArticle.taggedUsers.push(tagged[i]);
+                    var notifTagged = notifications.new(`${req.user.username} tagged you in a post!`, `/articles/${newArticle.id}`);
+                    notifications.sendToUsers(req.body.taggedFriends, notifTagged, (err, notifRecipients) => {
+                        if (err) {
+                            req.flash("error", err.message);
+                            return res.redirect("back");
                         }
+
+                        // Add tagged users to current article
+                        newArticle.taggedUsers = notifRecipients;
                         newArticle.save();
+
                         req.flash("success", "New Post Created");
                         return res.redirect(`/articles/${newArticle._id}`);
                     });
@@ -198,6 +198,8 @@ router.get("/:id", (req, res) => {
         } else if (!foundArticle) {
             req.flash('error', `Sorry, that article has been deleted!`);
             return res.redirect('back');
+        } else if (!req.user) {
+            return res.render("articles/show", { article: foundArticle, currentRoute: req.originalUrl });
         } else {
             // load a user's taggable users
             userUtils.getTaggableUsers(req.user, (err, taggableUsers) => {

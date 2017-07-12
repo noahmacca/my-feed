@@ -43,7 +43,7 @@ userUtils.getTaggableUsers = function (reqUser, next) {
 }
 
 // Parse and create new article from url
-userUtils.parseArticle = function (req, next) {
+userUtils.parseAndCreateArticle = function (req, next) {
     var url = req.body.url; // todo: auto-add http if they don't include it, in a way that still allows request to determine if invalid uri
     var article = {
         url: url,

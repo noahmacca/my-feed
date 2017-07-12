@@ -205,7 +205,7 @@ router.post("/user/:id/notifs-read", middleware.isLoggedIn, (req, res) => {
                     user.notifications[i].isRead = true;
                 }
                 // chop old notifications
-                user.notifications = user.notifications.slice(0, 10);
+                user.notifications = user.notifications.slice(-10);
                 user.save();
             }
             return res.redirect('back');
