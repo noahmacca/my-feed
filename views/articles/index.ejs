@@ -168,7 +168,7 @@
                             <p class='pre-wrap'><%= article.desc %></p>
                             <% if (article.taggedUsers.length > 0) { %>
                                 <div>
-                                    cc
+                                    Tagged:
                                     <% article.taggedUsers.forEach(function(taggedUser) { %>
                                         <span> <a href="/user/<%= taggedUser.id %>">@<%= taggedUser.username %></a></span>
                                     <% }) %>

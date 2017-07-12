@@ -64,7 +64,7 @@
                                 <p class="pre-wrap"><%= comment.text %></p>
                                 <% if (comment.taggedUsers) { %>
                                     <div>
-                                        cc
+                                        <strong>Tagged:</strong>
                                         <% comment.taggedUsers.forEach(function(taggedUser) { %>
                                             <span><a href="/user/<%= taggedUser.id %>">@<%= taggedUser.username %></a></span>
                                         <% }) %>
