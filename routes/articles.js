@@ -42,6 +42,10 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
                     var taggableUsers = user.following.concat(user.followers);
                     taggableUsers = taggableUsers.filter((user) => { return !(user._id.equals(req.user._id)) }); // remove own userId from list
                     taggableUsers = taggableUsers.map((el) => { return {"username": el.username, "id": String(el._id)} });
+                    var taggableIds = taggableUsers.map((el) => { return el.id });
+                    taggableUsers = taggableUsers.filter(function(item, pos) {
+                        return taggableIds.indexOf(item.id) == pos;
+                    });
                     return res.render('articles/index', { articles: validArticles, highlight: 'following', friends: suggestions.friends, topUsers: suggestions.topUsers, taggableUsers: taggableUsers })
                 });
             });
