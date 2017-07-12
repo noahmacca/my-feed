@@ -23,7 +23,7 @@
             <div>
                 <strong>Tagged: </strong>
                 <% article.taggedUsers.forEach(function(tagged) { %>
-                    <span><a href="/user/<%= tagged.id %>"><%= tagged.username %></a></span>
+                    <span><a href="/user/<%= tagged.id %>">@<%= tagged.username %></a></span>
                 <% }); %>
             </div>
             <div class="text-center">
@@ -64,8 +64,9 @@
                                 <p class="pre-wrap"><%= comment.text %></p>
                                 <% if (comment.taggedUsers) { %>
                                     <div>
+                                        cc
                                         <% comment.taggedUsers.forEach(function(taggedUser) { %>
-                                            <span>cc <a href="/user/<%= taggedUser.id %>">@<%= taggedUser.username %></a></span>
+                                            <span><a href="/user/<%= taggedUser.id %>">@<%= taggedUser.username %></a></span>
                                         <% }) %>
                                     </div>
                                 <% } %>

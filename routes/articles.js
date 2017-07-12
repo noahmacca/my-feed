@@ -23,7 +23,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
                 }
             }
 
-            validArticles = validArticles.slice(0, 40); // in case there's tons of matched articles
+            validArticles = validArticles.slice(-40); // in case there's tons of matched articles
 
             // populate list of people to follow
             userUtils.getSuggestedFollows(req.user, (err, suggestions) => {
