@@ -18,7 +18,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
         } else {
             var validArticles = [];
             for (var i = 0; i < allArticles.length; i++) {
-                if (isFolloweeInArray(req.user.following, allArticles[i].author.id)) {
+                if (isIdInArray(req.user.following, allArticles[i].author.id)) {
                     validArticles.push(allArticles[i]);
                 }
             }
@@ -48,7 +48,7 @@ router.get("/", middleware.isLoggedIn, (req, res) => {
 // INDEX - show article feed of all users
 router.get("/all", middleware.isLoggedIn, (req, res) => {
     Article.find({}, (err, allArticles) => {
-        allArticles = allArticles.slice(0, 40); // todo: introduce multi-page
+        allArticles = allArticles.slice(-40); // todo: introduce multi-page
         if (err) {
             console.log(err);
             req.flash("error", `Error getting articles from db: ${err.message}`);
@@ -84,7 +84,7 @@ router.get("/saved", middleware.isLoggedIn, (req, res) => {
         } else {
             var validArticles = [];
             for (var i = 0; i < allArticles.length; i++) {
-                if (isFolloweeInArray(req.user.savedArticles, allArticles[i]._id)) {
+                if (isIdInArray(req.user.savedArticles, allArticles[i]._id)) {
                     validArticles.push(allArticles[i]);
                 }
             }
@@ -264,25 +264,77 @@ router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         }
 
-        // Add like to the page
-        var userTemp = {
-            id: req.user._id,
-            username: req.user.username
+        var ids = article.likes.map((el) => {
+            return el.id
+        });
+
+        console.log(ids);
+
+        var _ids = article.likes.map((el) => {
+            return el._id
+        });
+
+        console.log(_ids);
+        console.log('------------');
+        console.log(req.user.id);
+        console.log(req.user._id);
+        
+        if (isIdInArrayV2(article.likes, req.user._id)) {
+            article.likes = copyArrayExcludingEntry(article.likes, req.user._id);
+            article.save();
+            req.flash('success', 'Unliked article!');
+            return res.redirect('back');
+        } else {
+            // Add like to the page
+            var userTemp = {
+                id: req.user._id,
+                username: req.user.username
+            }
+
+            article.likes.push(userTemp)
+            article.save();
+
+            // send notif to author of the article
+            User.findById(article.author.id, (err, author) => {
+                if (!article.author.id.equals(req.user._id)) {
+                    author.notifications.push(notifications.new(`${req.user.username} liked on your post!`, `/articles/${req.params.id}`));
+                    author.save();
+                }
+                req.flash('success', 'Liked article!');
+                return res.redirect("back");
+            });
         }
-        article.likes.push(userTemp)
-        article.save();
-        return res.redirect("back");
     });
 });
 
 module.exports = router;
 
 // Local Functions
-function isFolloweeInArray(followingArray, followee_id) {
+function isIdInArray(followingArray, followee_id) {
     for (var i = 0; i < followingArray.length; i++) {
         if (followingArray[i]._id.equals(followee_id)) {
             return true
         }
     }
     return false
+}
+
+// variation for non-underscore id
+function isIdInArrayV2(followingArray, followee_id) {
+    for (var i = 0; i < followingArray.length; i++) {
+        if (followingArray[i].id.equals(followee_id)) {
+            return true
+        }
+    }
+    return false
+}
+
+function copyArrayExcludingEntry(array, id) {
+    var newArray = [];
+    array.forEach((item) => {
+        if (!item.id.equals(id)) {
+            newArray.push(item);
+        }
+    });
+    return newArray;
 }
