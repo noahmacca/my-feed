@@ -264,21 +264,6 @@ router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         }
 
-        var ids = article.likes.map((el) => {
-            return el.id
-        });
-
-        console.log(ids);
-
-        var _ids = article.likes.map((el) => {
-            return el._id
-        });
-
-        console.log(_ids);
-        console.log('------------');
-        console.log(req.user.id);
-        console.log(req.user._id);
-        
         if (isIdInArrayV2(article.likes, req.user._id)) {
             article.likes = copyArrayExcludingEntry(article.likes, req.user._id);
             article.save();
