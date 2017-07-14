@@ -28,6 +28,15 @@ var articleSchema = new mongoose.Schema({
             },
             username: String
         }
+    ],
+    likes: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            username: String
+        }
     ]
 });
 

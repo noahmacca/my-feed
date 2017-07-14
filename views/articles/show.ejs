@@ -26,6 +26,12 @@
                     <span><a href="/user/<%= tagged.id %>">@<%= tagged.username %></a></span>
                 <% }); %>
             </div>
+            <div>
+                <strong>Liked by: </strong>
+                <% article.likes.forEach(function(likeUser) { %>
+                    <span><a href="/user/<%= likeUser.id %>">@<%= likeUser.username %></a></span>
+                <% }); %>
+            </div>
             <div class="text-center">
                 <a class="btn btn-primary btn-lg" href="/articles" role="button">Back to Feed</a>
             </div>

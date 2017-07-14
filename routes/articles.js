@@ -256,6 +256,25 @@ router.delete("/:id", middleware.isLoggedIn, middleware.checkPostOwnership, (req
     });
 });
 
+// LIKE ARTICLE
+router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
+    Article.findById(req.params.id, (err, article) => {
+        if (err) {
+            req.flash("error", `Error finding article: ${err.message}`);
+            return res.redirect("back");
+        }
+
+        // Add like to the page
+        var userTemp = {
+            id: req.user._id,
+            username: req.user.username
+        }
+        article.likes.push(userTemp)
+        article.save();
+        return res.redirect("back");
+    });
+});
+
 module.exports = router;
 
 // Local Functions
