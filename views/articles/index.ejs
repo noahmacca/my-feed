@@ -52,7 +52,8 @@
                 <ul class="nav nav-pills nav-stacked">
                     <li id="feed-following" role="presentation"><a href="/articles">Following</a></li>
                     <li id="feed-all" role="presentation"><a href="/articles/all">All Users</a></li>
-                    <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved</a></li>
+                    <!-- Removing 'Saved' feature for now  -->
+                    <!-- <li id="feed-saved" role="presentation"><a href="/articles/saved">Saved</a></li> -->
                 </ul>
             </div>
             <hr>
@@ -183,11 +184,15 @@
                             </div>
                         </div>
                         <div class="panel-footer">                            
+                            <a href="/articles/<%= article._id %>/like" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
+                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like (2)
+                            </a>
                             <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
                                 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
                             </a>
 
-                            <% if (isInMongoArray(currentUser.savedArticles, article._id)) { %>
+                            <!-- Commenting Out Share Feature for now  -->
+                            <!-- <% if (isInMongoArray(currentUser.savedArticles, article._id)) { %>
                                 <form action="/articles/unsave/<%= article._id%>" method="POST" class="pull-left">
                                     <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> Unsave</button>
                                 </form>
@@ -195,7 +200,7 @@
                                 <form action="/articles/save/<%= article._id%>" method="POST" class="pull-left">
                                     <button class="btn btn-default btn-sm btn-sm-wide pull-left"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Save</button>
                                 </form>
-                            <% } %>
+                            <% } %> -->
                             
                             <button id="share-button" class="btn btn-default btn-sm btn-sm-wide" onclick="showShareLink(<%=index%>)">
                                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share
