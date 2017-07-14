@@ -264,31 +264,48 @@ router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
             return res.redirect("back");
         }
 
-        if (isIdInArrayV2(article.likes, req.user._id)) {
-            article.likes = copyArrayExcludingEntry(article.likes, req.user._id);
-            article.save();
-            req.flash('success', 'Unliked article!');
-            return res.redirect('back');
-        } else {
-            // Add like to the page
-            var userTemp = {
-                id: req.user._id,
-                username: req.user.username
-            }
-
-            article.likes.push(userTemp)
-            article.save();
-
-            // send notif to author of the article
-            User.findById(article.author.id, (err, author) => {
-                if (!article.author.id.equals(req.user._id)) {
-                    author.notifications.push(notifications.new(`${req.user.username} liked on your post!`, `/articles/${req.params.id}`));
-                    author.save();
-                }
-                req.flash('success', 'Liked article!');
+        User.findById(req.user.id, (err, user) => {
+            if (err) {
+                req.flash("error", `Error finding article: ${err.message}`);
                 return res.redirect("back");
-            });
-        }
+            }
+            if (isIdInArrayV2(article.likes, req.user._id)) {
+                
+                // Remove from article's list of likes'
+                article.likes = copyArrayExcludingEntryV2(article.likes, req.user._id);
+                article.save();
+
+                // Remove from user's list of likes
+                user.likes = copyArrayExcludingEntry(user.likes, article._id);
+                user.save();
+
+                req.flash('success', 'Unliked article!');
+                return res.redirect('back');
+            } else {
+                // Add like to the page
+                var userTemp = {
+                    id: req.user._id,
+                    username: req.user.username
+                }
+                article.likes.push(userTemp)
+                article.save();
+
+                // Add article to user's likes
+                user.likes.push(article._id);
+                user.save();
+
+                // send notif to author of the article
+                User.findById(article.author.id, (err, author) => {
+                    if (!article.author.id.equals(req.user._id)) {
+                        author.notifications.push(notifications.new(`${req.user.username} liked on your post!`, `/articles/${req.params.id}`));
+                        author.save();
+                    }
+                    req.flash('success', 'Liked article!');
+                    return res.redirect("back");
+                });
+            }
+        });
+
     });
 });
 
@@ -314,7 +331,19 @@ function isIdInArrayV2(followingArray, followee_id) {
     return false
 }
 
+// copy array without any of the specified ids
 function copyArrayExcludingEntry(array, id) {
+    var newArray = [];
+    array.forEach((item) => {
+        if (!item._id.equals(id)) {
+            newArray.push(item);
+        }
+    });
+    return newArray;
+}
+
+// variation for non-underscore id
+function copyArrayExcludingEntryV2(array, id) {
     var newArray = [];
     array.forEach((item) => {
         if (!item.id.equals(id)) {

@@ -23,7 +23,7 @@ var userSchema = new mongoose.Schema({
         }
     ],
     following: [
-    {
+        {
             id: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
@@ -44,6 +44,14 @@ var userSchema = new mongoose.Schema({
             message: String,
             link: String,
             isRead: Boolean
+        }
+    ],
+    likes: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Article"
+            }
         }
     ]
 });
