@@ -279,7 +279,6 @@ router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
                 user.likes = copyArrayExcludingEntry(user.likes, article._id);
                 user.save();
 
-                req.flash('success', 'Unliked article!');
                 return res.redirect('back');
             } else {
                 // Add like to the page
@@ -297,10 +296,9 @@ router.get("/:id/like", middleware.isLoggedIn, (req, res) => {
                 // send notif to author of the article
                 User.findById(article.author.id, (err, author) => {
                     if (!article.author.id.equals(req.user._id)) {
-                        author.notifications.push(notifications.new(`${req.user.username} liked on your post!`, `/articles/${req.params.id}`));
+                        author.notifications.push(notifications.new(`${req.user.username} liked your post!`, `/articles/${req.params.id}`));
                         author.save();
                     }
-                    req.flash('success', 'Liked article!');
                     return res.redirect("back");
                 });
             }

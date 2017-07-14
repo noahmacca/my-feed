@@ -29,6 +29,15 @@
         }
         return false
     }
+
+    function isIdInMongoArrayV2(mongoArray, id) {
+        for (var i=0; i < mongoArray.length; i++) {
+            if (mongoArray[i].id == id) {
+                return true
+            }
+        }
+        return false
+    }
 %>
 
 <!--Remove the facebook redirect bug-->
@@ -183,10 +192,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="panel-footer">                            
+                        <div class="panel-footer">
                             <a href="/articles/<%= article._id %>/like" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
-                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like (<%=article.likes.length %>)
-                            </a>
+                                
+                                <% if (currentUser && article.likes.length && isIdInMongoArrayV2(article.likes, currentUser.id)) { %>
+                                    <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Unlike (<%=article.likes.length %>)
+                                <% } else { %>
+                                    <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> Like (<%=article.likes.length %>)
+                                <% } %>
+                                </a>
                             <a href="/articles/<%= article._id %>" type="button" class="btn btn-default btn-sm pull-left btn-sm-wide">
                                 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comments (<%=article.comments.length + 1%>)
                             </a>
